@@ -3,7 +3,9 @@
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 
-export function NewTaskForm({ categoryId }: { categoryId: string }) {
+type Member = { id: string; name: string };
+
+export function NewTaskForm({ categoryId, members }: { categoryId: string; members: Member[] }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -20,7 +22,7 @@ export function NewTaskForm({ categoryId }: { categoryId: string }) {
         body: JSON.stringify({
           categoryId,
           title: formData.get("title"),
-          assignee: formData.get("assignee"),
+          memberId: formData.get("memberId"),
           estimatedCost: formData.get("estimatedCost"),
         }),
       });
@@ -53,11 +55,18 @@ export function NewTaskForm({ categoryId }: { categoryId: string }) {
         required
         className="w-full rounded-md border border-white/20 bg-black/20 px-2 py-1 text-xs"
       />
-      <input
-        name="assignee"
-        placeholder="Zuständig (optional)"
+      <select
+        name="memberId"
+        defaultValue=""
         className="w-full rounded-md border border-white/20 bg-black/20 px-2 py-1 text-xs"
-      />
+      >
+        <option value="">Nicht zugewiesen</option>
+        {members.map((member) => (
+          <option key={member.id} value={member.id}>
+            {member.name}
+          </option>
+        ))}
+      </select>
       <input
         name="estimatedCost"
         type="number"

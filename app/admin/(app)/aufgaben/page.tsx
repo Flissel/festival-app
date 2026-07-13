@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { TaskCard } from "@/components/admin/TaskCard";
 import { NewTaskForm } from "@/components/admin/NewTaskForm";
 import { NewCategoryForm } from "@/components/admin/NewCategoryForm";
+import { CategoryHeader } from "@/components/admin/CategoryHeader";
 
 export const dynamic = "force-dynamic";
 
@@ -12,10 +13,13 @@ const COLUMNS = [
 ];
 
 export default async function AdminTasksPage() {
-  const categories = await prisma.budgetCategory.findMany({
-    orderBy: { sortOrder: "asc" },
-    include: { tasks: { orderBy: { createdAt: "asc" } } },
-  });
+  const [categories, members] = await Promise.all([
+    prisma.budgetCategory.findMany({
+      orderBy: { sortOrder: "asc" },
+      include: { tasks: { include: { member: true }, orderBy: { createdAt: "asc" } } },
+    }),
+    prisma.member.findMany({ orderBy: { name: "asc" } }),
+  ]);
 
   return (
     <div className="space-y-8">
@@ -27,8 +31,12 @@ export default async function AdminTasksPage() {
       {categories.map((category) => (
         <section key={category.id} className="space-y-3">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold">{category.name}</h2>
-            <NewTaskForm categoryId={category.id} />
+            <CategoryHeader
+              categoryId={category.id}
+              name={category.name}
+              taskCount={category.tasks.length}
+            />
+            <NewTaskForm categoryId={category.id} members={members} />
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             {COLUMNS.map((column) => (
@@ -40,11 +48,15 @@ export default async function AdminTasksPage() {
                     .map((task) => (
                       <TaskCard
                         key={task.id}
+                        members={members}
                         task={{
                           id: task.id,
                           title: task.title,
                           status: task.status,
-                          assignee: task.assignee,
+                          categoryName: category.name,
+                          member: task.member
+                            ? { id: task.member.id, name: task.member.name, phone: task.member.phone }
+                            : null,
                           estimatedCost: task.estimatedCost?.toString() ?? null,
                           actualCost: task.actualCost?.toString() ?? null,
                         }}

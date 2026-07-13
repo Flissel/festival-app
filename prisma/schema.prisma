@@ -63,13 +63,22 @@ model BudgetCategory {
   tasks     Task[]
 }
 
+model Member {
+  id        String   @id @default(cuid())
+  name      String
+  phone     String
+  createdAt DateTime @default(now())
+  tasks     Task[]
+}
+
 model Task {
   id             String         @id @default(cuid())
-  category       BudgetCategory @relation(fields: [categoryId], references: [id])
+  category       BudgetCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   categoryId     String
   title          String
   status         TaskStatus     @default(open)
-  assignee       String?
+  member         Member?        @relation(fields: [memberId], references: [id], onDelete: SetNull)
+  memberId       String?
   estimatedCost  Decimal?       @db.Decimal(10, 2)
   actualCost     Decimal?       @db.Decimal(10, 2)
   createdAt      DateTime       @default(now())

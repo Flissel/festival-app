@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 
 const bodySchema = z.object({
   status: z.enum(["open", "in_progress", "done"]).optional(),
-  assignee: z.string().trim().max(100).optional().or(z.literal("")),
+  memberId: z.string().trim().max(100).optional().or(z.literal("")),
   actualCost: z.coerce.number().nonnegative().max(1000000).optional().or(z.literal("")),
 });
 
@@ -21,13 +21,20 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     return NextResponse.json({ error: "Aufgabe nicht gefunden" }, { status: 404 });
   }
 
-  const { status, assignee, actualCost } = parsed.data;
+  const { status, memberId, actualCost } = parsed.data;
+
+  if (memberId) {
+    const member = await prisma.member.findUnique({ where: { id: memberId } });
+    if (!member) {
+      return NextResponse.json({ error: "Member nicht gefunden" }, { status: 404 });
+    }
+  }
 
   const updated = await prisma.task.update({
     where: { id },
     data: {
       ...(status !== undefined ? { status } : {}),
-      ...(assignee !== undefined ? { assignee: assignee || null } : {}),
+      ...(memberId !== undefined ? { memberId: memberId || null } : {}),
       ...(actualCost !== undefined
         ? { actualCost: actualCost === "" ? null : actualCost }
         : {}),
