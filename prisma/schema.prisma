@@ -1,0 +1,87 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum PaymentStatus {
+  pending
+  cash_pending
+  paid
+}
+
+enum PaymentRecordStatus {
+  pending
+  completed
+}
+
+enum TaskStatus {
+  open
+  in_progress
+  done
+}
+
+enum RequestStatus {
+  open
+  answered
+}
+
+model Guest {
+  id            String        @id @default(cuid())
+  name          String
+  email         String
+  phone         String?
+  plusOnes      Int           @default(0)
+  allergies     String?
+  paymentStatus PaymentStatus @default(pending)
+  createdAt     DateTime      @default(now())
+  payments      Payment[]
+}
+
+model Payment {
+  id            String               @id @default(cuid())
+  guest         Guest                @relation(fields: [guestId], references: [id])
+  guestId       String
+  amount        Decimal              @db.Decimal(10, 2)
+  currency      String               @default("EUR")
+  paypalOrderId String?              @unique
+  status        PaymentRecordStatus  @default(pending)
+  createdAt     DateTime             @default(now())
+  completedAt   DateTime?
+}
+
+model BudgetCategory {
+  id        String   @id @default(cuid())
+  name      String
+  sortOrder Int      @default(0)
+  tasks     Task[]
+}
+
+model Task {
+  id             String         @id @default(cuid())
+  category       BudgetCategory @relation(fields: [categoryId], references: [id])
+  categoryId     String
+  title          String
+  status         TaskStatus     @default(open)
+  assignee       String?
+  estimatedCost  Decimal?       @db.Decimal(10, 2)
+  actualCost     Decimal?       @db.Decimal(10, 2)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+}
+
+model Request {
+  id         String        @id @default(cuid())
+  name       String
+  email      String
+  message    String
+  status     RequestStatus @default(open)
+  createdAt  DateTime      @default(now())
+  answeredAt DateTime?
+}
