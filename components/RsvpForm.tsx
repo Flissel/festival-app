@@ -203,6 +203,16 @@ export function RsvpForm({ paypalClientId }: Props) {
 
       {errorMessage && <p className="text-sm text-red-400">{errorMessage}</p>}
 
+      <p className="text-xs text-white/40">
+        Deine Angaben werden ausschließlich zur Organisation dieses Events genutzt (Gästeliste,
+        Zahlungsabgleich, Verpflegungsplanung) und nicht an Dritte weitergegeben. Fragen zu
+        deinen Daten? Schreib uns über{" "}
+        <a href="/anfrage" className="underline">
+          das Kontaktformular
+        </a>
+        .
+      </p>
+
       <button
         type="submit"
         disabled={submitting}
