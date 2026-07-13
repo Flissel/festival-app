@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
+import { notifyTaskAssignment } from "@/lib/taskNotifications";
 
 const bodySchema = z.object({
   status: z.enum(["open", "in_progress", "done"]).optional(),
@@ -17,7 +18,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     return NextResponse.json({ error: "Ungültige Eingabe" }, { status: 400 });
   }
 
-  const task = await prisma.task.findUnique({ where: { id } });
+  const task = await prisma.task.findUnique({ where: { id }, include: { category: true } });
   if (!task) {
     return NextResponse.json({ error: "Aufgabe nicht gefunden" }, { status: 404 });
   }
@@ -38,15 +39,16 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     }
   }
 
+  const isReassignment = memberId !== undefined || teamId !== undefined;
+
   // Assignment is either a single member or a whole team, never both.
-  const assignmentUpdate =
-    memberId !== undefined || teamId !== undefined
-      ? memberId
-        ? { memberId, teamId: null }
-        : teamId
-          ? { teamId, memberId: null }
-          : { memberId: null, teamId: null }
-      : {};
+  const assignmentUpdate = isReassignment
+    ? memberId
+      ? { memberId, teamId: null }
+      : teamId
+        ? { teamId, memberId: null }
+        : { memberId: null, teamId: null }
+    : {};
 
   const updated = await prisma.task.update({
     where: { id },
@@ -58,6 +60,15 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
         : {}),
     },
   });
+
+  if (isReassignment && (memberId || teamId)) {
+    notifyTaskAssignment({
+      memberId: memberId || null,
+      teamId: teamId || null,
+      taskTitle: task.title,
+      categoryName: task.category.name,
+    }).catch(() => {});
+  }
 
   return NextResponse.json({ task: updated });
 }

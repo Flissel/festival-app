@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
+import { notifyTaskAssignment } from "@/lib/taskNotifications";
 
 const bodySchema = z.object({
   categoryId: z.string().min(1),
@@ -47,6 +48,15 @@ export async function POST(request: NextRequest) {
       estimatedCost: estimatedCost === "" || estimatedCost === undefined ? null : estimatedCost,
     },
   });
+
+  if (memberId || teamId) {
+    notifyTaskAssignment({
+      memberId: memberId || null,
+      teamId: teamId || null,
+      taskTitle: title,
+      categoryName: category.name,
+    }).catch(() => {});
+  }
 
   return NextResponse.json({ task });
 }
