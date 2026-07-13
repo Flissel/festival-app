@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { PaypalDonation } from "@/components/PaypalDonation";
 
 type PaymentMethod = "online" | "cash";
 
@@ -10,7 +11,11 @@ type RsvpResult = {
   amount: number | null;
 };
 
-export function RsvpForm() {
+type Props = {
+  paypalClientId: string;
+};
+
+export function RsvpForm({ paypalClientId }: Props) {
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("online");
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -72,13 +77,13 @@ export function RsvpForm() {
               Fast geschafft — schließe deine Anmeldung mit der Zahlung von{" "}
               {result.amount?.toFixed(2)}&nbsp;€ ab.
             </p>
-            <div
-              className="mt-4 rounded-lg border border-dashed border-white/20 p-4 text-sm text-white/50"
-              data-guest-id={result.guestId}
-              data-amount={result.amount ?? undefined}
-            >
-              PayPal-Zahlung folgt hier.
-            </div>
+            {result.amount !== null && (
+              <PaypalDonation
+                clientId={paypalClientId}
+                guestId={result.guestId}
+                amount={result.amount}
+              />
+            )}
           </div>
         )}
       </div>

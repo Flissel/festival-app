@@ -1,6 +1,8 @@
 import { RsvpForm } from "@/components/RsvpForm";
 
 export default function HomePage() {
+  const paypalClientId = process.env.PAYPAL_CLIENT_ID ?? "";
+
   return (
     <main className="flex min-h-screen flex-1 flex-col bg-gradient-to-b from-neutral-950 via-neutral-900 to-neutral-950 text-white">
       <div className="mx-auto w-full max-w-2xl flex-1 px-6 py-16">
@@ -15,7 +17,7 @@ export default function HomePage() {
           </p>
         </header>
 
-        <RsvpForm />
+        <RsvpForm paypalClientId={paypalClientId} />
 
         <p className="mt-10 text-center text-xs text-white/40">
           Fragen? Nutze den Link in unserer Telegram-Orga-Gruppe oder schreib uns über{" "}
