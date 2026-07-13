@@ -6,18 +6,16 @@ import { buildWhatsAppLink } from "@/lib/whatsapp";
 
 type TaskStatus = "open" | "in_progress" | "done";
 
-type Member = {
-  id: string;
-  name: string;
-  phone: string;
-};
+type MemberRef = { id: string; name: string; phone: string };
+type TeamRef = { id: string; name: string; members: MemberRef[] };
 
 type Task = {
   id: string;
   title: string;
   status: TaskStatus;
   categoryName: string;
-  member: Member | null;
+  member: MemberRef | null;
+  team: { id: string; name: string } | null;
   estimatedCost: string | null;
   actualCost: string | null;
 };
@@ -28,7 +26,19 @@ const statusLabels: Record<TaskStatus, string> = {
   done: "Erledigt",
 };
 
-export function TaskCard({ task, members }: { task: Task; members: Member[] }) {
+function messageFor(name: string, task: Task) {
+  return `Hi ${name}, du bist für "${task.title}" (${task.categoryName}) eingeteilt. Danke!`;
+}
+
+export function TaskCard({
+  task,
+  members,
+  teams,
+}: {
+  task: Task;
+  members: MemberRef[];
+  teams: TeamRef[];
+}) {
   const router = useRouter();
   const [actualCost, setActualCost] = useState(task.actualCost ?? "");
   const [saving, setSaving] = useState(false);
@@ -47,12 +57,17 @@ export function TaskCard({ task, members }: { task: Task; members: Member[] }) {
     }
   }
 
-  const whatsappLink = task.member
-    ? buildWhatsAppLink(
-        task.member.phone,
-        `Hi ${task.member.name}, du bist für "${task.title}" (${task.categoryName}) eingeteilt. Danke!`
-      )
-    : null;
+  function handleAssignmentChange(value: string) {
+    if (value.startsWith("m:")) {
+      updateTask({ memberId: value.slice(2), teamId: "" });
+    } else if (value.startsWith("t:")) {
+      updateTask({ teamId: value.slice(2), memberId: "" });
+    } else {
+      updateTask({ memberId: "", teamId: "" });
+    }
+  }
+
+  const assignedTeam = task.team ? teams.find((t) => t.id === task.team!.id) : null;
 
   return (
     <div className="rounded-lg border border-white/10 bg-white/5 p-3 text-sm">
@@ -60,29 +75,58 @@ export function TaskCard({ task, members }: { task: Task; members: Member[] }) {
 
       <div className="mt-2 flex items-center gap-2">
         <select
-          value={task.member?.id ?? ""}
+          value={task.member ? `m:${task.member.id}` : task.team ? `t:${task.team.id}` : ""}
           disabled={saving}
-          onChange={(event) => updateTask({ memberId: event.target.value })}
+          onChange={(event) => handleAssignmentChange(event.target.value)}
           className="rounded-md border border-white/20 bg-black/20 px-2 py-1 text-xs"
         >
           <option value="">Nicht zugewiesen</option>
-          {members.map((member) => (
-            <option key={member.id} value={member.id}>
-              {member.name}
-            </option>
-          ))}
+          <optgroup label="Members">
+            {members.map((member) => (
+              <option key={member.id} value={`m:${member.id}`}>
+                {member.name}
+              </option>
+            ))}
+          </optgroup>
+          <optgroup label="Teams">
+            {teams.map((team) => (
+              <option key={team.id} value={`t:${team.id}`}>
+                {team.name}
+              </option>
+            ))}
+          </optgroup>
         </select>
-        {whatsappLink && (
-          <a
-            href={whatsappLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="rounded-md bg-emerald-500/20 px-2 py-1 text-xs text-emerald-300 hover:bg-emerald-500/30"
-          >
-            WhatsApp senden
-          </a>
-        )}
       </div>
+
+      {task.member && (
+        <a
+          href={buildWhatsAppLink(task.member.phone, messageFor(task.member.name, task))}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-2 inline-block rounded-md bg-emerald-500/20 px-2 py-1 text-xs text-emerald-300 hover:bg-emerald-500/30"
+        >
+          WhatsApp senden
+        </a>
+      )}
+
+      {assignedTeam && (
+        <div className="mt-2 flex flex-wrap gap-1">
+          {assignedTeam.members.length === 0 && (
+            <span className="text-xs text-white/40">Team hat noch keine Members.</span>
+          )}
+          {assignedTeam.members.map((member) => (
+            <a
+              key={member.id}
+              href={buildWhatsAppLink(member.phone, messageFor(member.name, task))}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-md bg-emerald-500/20 px-2 py-1 text-xs text-emerald-300 hover:bg-emerald-500/30"
+            >
+              WhatsApp an {member.name}
+            </a>
+          ))}
+        </div>
+      )}
 
       <div className="mt-2 flex items-center gap-2">
         <select

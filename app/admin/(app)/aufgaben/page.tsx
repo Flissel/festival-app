@@ -13,12 +13,15 @@ const COLUMNS = [
 ];
 
 export default async function AdminTasksPage() {
-  const [categories, members] = await Promise.all([
+  const [categories, members, teams] = await Promise.all([
     prisma.budgetCategory.findMany({
       orderBy: { sortOrder: "asc" },
-      include: { tasks: { include: { member: true }, orderBy: { createdAt: "asc" } } },
+      include: {
+        tasks: { include: { member: true, team: true }, orderBy: { createdAt: "asc" } },
+      },
     }),
     prisma.member.findMany({ orderBy: { name: "asc" } }),
+    prisma.team.findMany({ orderBy: { name: "asc" }, include: { members: true } }),
   ]);
 
   return (
@@ -36,7 +39,7 @@ export default async function AdminTasksPage() {
               name={category.name}
               taskCount={category.tasks.length}
             />
-            <NewTaskForm categoryId={category.id} members={members} />
+            <NewTaskForm categoryId={category.id} members={members} teams={teams} />
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             {COLUMNS.map((column) => (
@@ -49,6 +52,7 @@ export default async function AdminTasksPage() {
                       <TaskCard
                         key={task.id}
                         members={members}
+                        teams={teams}
                         task={{
                           id: task.id,
                           title: task.title,
@@ -57,6 +61,7 @@ export default async function AdminTasksPage() {
                           member: task.member
                             ? { id: task.member.id, name: task.member.name, phone: task.member.phone }
                             : null,
+                          team: task.team ? { id: task.team.id, name: task.team.name } : null,
                           estimatedCost: task.estimatedCost?.toString() ?? null,
                           actualCost: task.actualCost?.toString() ?? null,
                         }}

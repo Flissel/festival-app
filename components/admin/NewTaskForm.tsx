@@ -4,8 +4,17 @@ import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 
 type Member = { id: string; name: string };
+type Team = { id: string; name: string };
 
-export function NewTaskForm({ categoryId, members }: { categoryId: string; members: Member[] }) {
+export function NewTaskForm({
+  categoryId,
+  members,
+  teams,
+}: {
+  categoryId: string;
+  members: Member[];
+  teams: Team[];
+}) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -14,6 +23,7 @@ export function NewTaskForm({ categoryId, members }: { categoryId: string; membe
     event.preventDefault();
     setSubmitting(true);
     const formData = new FormData(event.currentTarget);
+    const assignment = String(formData.get("assignment") ?? "");
 
     try {
       const response = await fetch("/api/admin/tasks", {
@@ -22,7 +32,8 @@ export function NewTaskForm({ categoryId, members }: { categoryId: string; membe
         body: JSON.stringify({
           categoryId,
           title: formData.get("title"),
-          memberId: formData.get("memberId"),
+          memberId: assignment.startsWith("m:") ? assignment.slice(2) : "",
+          teamId: assignment.startsWith("t:") ? assignment.slice(2) : "",
           estimatedCost: formData.get("estimatedCost"),
         }),
       });
@@ -56,16 +67,25 @@ export function NewTaskForm({ categoryId, members }: { categoryId: string; membe
         className="w-full rounded-md border border-white/20 bg-black/20 px-2 py-1 text-xs"
       />
       <select
-        name="memberId"
+        name="assignment"
         defaultValue=""
         className="w-full rounded-md border border-white/20 bg-black/20 px-2 py-1 text-xs"
       >
         <option value="">Nicht zugewiesen</option>
-        {members.map((member) => (
-          <option key={member.id} value={member.id}>
-            {member.name}
-          </option>
-        ))}
+        <optgroup label="Members">
+          {members.map((member) => (
+            <option key={member.id} value={`m:${member.id}`}>
+              {member.name}
+            </option>
+          ))}
+        </optgroup>
+        <optgroup label="Teams">
+          {teams.map((team) => (
+            <option key={team.id} value={`t:${team.id}`}>
+              {team.name}
+            </option>
+          ))}
+        </optgroup>
       </select>
       <input
         name="estimatedCost"

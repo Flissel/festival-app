@@ -6,6 +6,7 @@ const bodySchema = z.object({
   categoryId: z.string().min(1),
   title: z.string().trim().min(1).max(200),
   memberId: z.string().trim().max(100).optional().or(z.literal("")),
+  teamId: z.string().trim().max(100).optional().or(z.literal("")),
   estimatedCost: z.coerce.number().nonnegative().max(1000000).optional().or(z.literal("")),
 });
 
@@ -16,7 +17,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Ungültige Eingabe" }, { status: 400 });
   }
 
-  const { categoryId, title, memberId, estimatedCost } = parsed.data;
+  const { categoryId, title, memberId, teamId, estimatedCost } = parsed.data;
 
   const category = await prisma.budgetCategory.findUnique({ where: { id: categoryId } });
   if (!category) {
@@ -30,11 +31,19 @@ export async function POST(request: NextRequest) {
     }
   }
 
+  if (teamId) {
+    const team = await prisma.team.findUnique({ where: { id: teamId } });
+    if (!team) {
+      return NextResponse.json({ error: "Team nicht gefunden" }, { status: 404 });
+    }
+  }
+
   const task = await prisma.task.create({
     data: {
       categoryId,
       title,
       memberId: memberId || null,
+      teamId: teamId || null,
       estimatedCost: estimatedCost === "" || estimatedCost === undefined ? null : estimatedCost,
     },
   });

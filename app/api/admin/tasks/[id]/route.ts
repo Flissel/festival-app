@@ -4,7 +4,8 @@ import { prisma } from "@/lib/prisma";
 
 const bodySchema = z.object({
   status: z.enum(["open", "in_progress", "done"]).optional(),
-  memberId: z.string().trim().max(100).optional().or(z.literal("")),
+  memberId: z.string().trim().max(100).optional(),
+  teamId: z.string().trim().max(100).optional(),
   actualCost: z.coerce.number().nonnegative().max(1000000).optional().or(z.literal("")),
 });
 
@@ -21,7 +22,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     return NextResponse.json({ error: "Aufgabe nicht gefunden" }, { status: 404 });
   }
 
-  const { status, memberId, actualCost } = parsed.data;
+  const { status, memberId, teamId, actualCost } = parsed.data;
 
   if (memberId) {
     const member = await prisma.member.findUnique({ where: { id: memberId } });
@@ -30,11 +31,28 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     }
   }
 
+  if (teamId) {
+    const team = await prisma.team.findUnique({ where: { id: teamId } });
+    if (!team) {
+      return NextResponse.json({ error: "Team nicht gefunden" }, { status: 404 });
+    }
+  }
+
+  // Assignment is either a single member or a whole team, never both.
+  const assignmentUpdate =
+    memberId !== undefined || teamId !== undefined
+      ? memberId
+        ? { memberId, teamId: null }
+        : teamId
+          ? { teamId, memberId: null }
+          : { memberId: null, teamId: null }
+      : {};
+
   const updated = await prisma.task.update({
     where: { id },
     data: {
       ...(status !== undefined ? { status } : {}),
-      ...(memberId !== undefined ? { memberId: memberId || null } : {}),
+      ...assignmentUpdate,
       ...(actualCost !== undefined
         ? { actualCost: actualCost === "" ? null : actualCost }
         : {}),

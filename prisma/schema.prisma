@@ -63,11 +63,21 @@ model BudgetCategory {
   tasks     Task[]
 }
 
+model Team {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  members   Member[]
+  tasks     Task[]
+}
+
 model Member {
   id        String   @id @default(cuid())
   name      String
   phone     String
   createdAt DateTime @default(now())
+  team      Team?    @relation(fields: [teamId], references: [id], onDelete: SetNull)
+  teamId    String?
   tasks     Task[]
 }
 
@@ -79,6 +89,8 @@ model Task {
   status         TaskStatus     @default(open)
   member         Member?        @relation(fields: [memberId], references: [id], onDelete: SetNull)
   memberId       String?
+  team           Team?          @relation(fields: [teamId], references: [id], onDelete: SetNull)
+  teamId         String?
   estimatedCost  Decimal?       @db.Decimal(10, 2)
   actualCost     Decimal?       @db.Decimal(10, 2)
   createdAt      DateTime       @default(now())
