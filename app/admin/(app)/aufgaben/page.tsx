@@ -3,6 +3,8 @@ import { TaskCard } from "@/components/admin/TaskCard";
 import { NewTaskForm } from "@/components/admin/NewTaskForm";
 import { NewCategoryForm } from "@/components/admin/NewCategoryForm";
 
+export const dynamic = "force-dynamic";
+
 const COLUMNS = [
   { status: "open" as const, label: "Offen" },
   { status: "in_progress" as const, label: "In Arbeit" },

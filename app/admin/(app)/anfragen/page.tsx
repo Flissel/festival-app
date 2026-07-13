@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { MarkAnsweredButton } from "@/components/admin/MarkAnsweredButton";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminRequestsPage() {
   const requests = await prisma.request.findMany({ orderBy: { createdAt: "desc" } });
 

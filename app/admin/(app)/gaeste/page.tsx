@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { MarkPaidForm } from "@/components/admin/MarkPaidForm";
 
+export const dynamic = "force-dynamic";
+
 const statusLabels: Record<string, string> = {
   pending: "Online ausstehend",
   cash_pending: "Bar ausstehend",
