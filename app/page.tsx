@@ -1,4 +1,5 @@
 import { RsvpForm } from "@/components/RsvpForm";
+import { LocationMap } from "@/components/LocationMap";
 
 export default function HomePage() {
   const paypalClientId = process.env.PAYPAL_CLIENT_ID ?? "";
@@ -16,6 +17,8 @@ export default function HomePage() {
             deinen Platz. Der Beitrag ist auf Spendenbasis, du entscheidest die Höhe.
           </p>
         </header>
+
+        <LocationMap />
 
         <RsvpForm paypalClientId={paypalClientId} />
 
