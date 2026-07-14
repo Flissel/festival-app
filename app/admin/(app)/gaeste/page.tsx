@@ -15,8 +15,8 @@ export default async function AdminGuestsPage() {
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">Gäste</h1>
-      <div className="overflow-hidden rounded-xl border border-white/10">
-        <table className="w-full text-sm">
+      <div className="overflow-x-auto rounded-xl border border-white/10">
+        <table className="w-full min-w-[640px] text-sm">
           <thead className="bg-white/5 text-left text-white/60">
             <tr>
               <th className="px-4 py-2">Name</th>

@@ -39,8 +39,8 @@ export default async function AdminMembersPage() {
           <h2 className="text-xl font-bold">Members</h2>
           <NewMemberForm />
         </div>
-        <div className="overflow-hidden rounded-xl border border-white/10">
-          <table className="w-full text-sm">
+        <div className="overflow-x-auto rounded-xl border border-white/10">
+          <table className="w-full min-w-[480px] text-sm">
             <thead className="bg-white/5 text-left text-white/60">
               <tr>
                 <th className="px-4 py-2">Name</th>
