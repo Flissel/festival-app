@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { logger } from "@/lib/logger";
 import { rsvpSchema } from "@/lib/validation/rsvp";
+import { sendRsvpConfirmation } from "@/lib/email";
 
 export async function POST(request: NextRequest) {
   const body: unknown = await request.json().catch(() => null);
@@ -28,6 +29,13 @@ export async function POST(request: NextRequest) {
   });
 
   logger.info("rsvp.created", { guestId: guest.id, paymentMethod });
+
+  sendRsvpConfirmation({
+    to: email,
+    name,
+    paymentMethod,
+    amount: amount ?? null,
+  }).catch(() => {});
 
   return NextResponse.json({
     guestId: guest.id,
