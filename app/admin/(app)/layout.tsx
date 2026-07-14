@@ -22,6 +22,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <Link href="/admin/anfragen" className="hover:underline">
               Anfragen
             </Link>
+            <Link href="/admin/broadcast" className="hover:underline">
+              Broadcast
+            </Link>
           </nav>
           <LogoutButton />
         </div>
