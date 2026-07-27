@@ -2,12 +2,18 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { notifyTaskAssignment } from "@/lib/taskNotifications";
+import { parseDueDate } from "@/lib/dueDate";
 
 const bodySchema = z.object({
   status: z.enum(["open", "in_progress", "done"]).optional(),
   memberId: z.string().trim().max(100).optional(),
   teamId: z.string().trim().max(100).optional(),
   actualCost: z.coerce.number().nonnegative().max(1000000).optional().or(z.literal("")),
+  dueDate: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional()
+    .or(z.literal("")),
 });
 
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -23,7 +29,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     return NextResponse.json({ error: "Aufgabe nicht gefunden" }, { status: 404 });
   }
 
-  const { status, memberId, teamId, actualCost } = parsed.data;
+  const { status, memberId, teamId, actualCost, dueDate } = parsed.data;
 
   if (memberId) {
     const member = await prisma.member.findUnique({ where: { id: memberId } });
@@ -58,6 +64,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       ...(actualCost !== undefined
         ? { actualCost: actualCost === "" ? null : actualCost }
         : {}),
+      ...(dueDate !== undefined ? { dueDate: parseDueDate(dueDate || undefined) } : {}),
     },
   });
 

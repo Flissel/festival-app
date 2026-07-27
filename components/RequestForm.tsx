@@ -17,6 +17,7 @@ export function RequestForm() {
       name: formData.get("name"),
       email: formData.get("email"),
       message: formData.get("message"),
+      website: formData.get("website"),
     };
 
     try {
@@ -27,7 +28,12 @@ export function RequestForm() {
       });
 
       if (!response.ok) {
-        setErrorMessage("Senden fehlgeschlagen. Bitte versuch es erneut.");
+        const data: unknown = await response.json().catch(() => null);
+        const message =
+          data && typeof data === "object" && "error" in data && typeof data.error === "string"
+            ? data.error
+            : "Senden fehlgeschlagen. Bitte versuch es erneut.";
+        setErrorMessage(message);
         return;
       }
 
@@ -50,6 +56,12 @@ export function RequestForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
+      {/* Honeypot: für Menschen unsichtbar, Bots füllen es aus */}
+      <div aria-hidden="true" className="absolute -left-[9999px] top-auto h-px w-px overflow-hidden">
+        <label htmlFor="website">Website</label>
+        <input id="website" name="website" type="text" tabIndex={-1} autoComplete="off" />
+      </div>
+
       <div>
         <label htmlFor="name" className="block text-sm font-medium">
           Name

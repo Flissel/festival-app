@@ -40,6 +40,7 @@ model Guest {
   plusOnes      Int           @default(0)
   allergies     String?
   paymentStatus PaymentStatus @default(pending)
+  waitlisted    Boolean       @default(false)
   createdAt     DateTime      @default(now())
   payments      Payment[]
 }
@@ -93,6 +94,7 @@ model Task {
   teamId         String?
   estimatedCost  Decimal?       @db.Decimal(10, 2)
   actualCost     Decimal?       @db.Decimal(10, 2)
+  dueDate        DateTime?
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
 }

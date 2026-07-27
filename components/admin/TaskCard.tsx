@@ -18,7 +18,13 @@ type Task = {
   team: { id: string; name: string } | null;
   estimatedCost: string | null;
   actualCost: string | null;
+  dueDate: string | null; // "YYYY-MM-DD"
 };
+
+function isOverdue(task: Task): boolean {
+  if (!task.dueDate || task.status === "done") return false;
+  return task.dueDate < new Date().toISOString().slice(0, 10);
+}
 
 const statusLabels: Record<TaskStatus, string> = {
   open: "Offen",
@@ -69,9 +75,16 @@ export function TaskCard({
 
   const assignedTeam = task.team ? teams.find((t) => t.id === task.team!.id) : null;
 
+  const overdue = isOverdue(task);
+
   return (
-    <div className="rounded-lg border border-white/10 bg-white/5 p-3 text-sm">
+    <div
+      className={`rounded-lg border p-3 text-sm ${
+        overdue ? "border-red-400/40 bg-red-500/5" : "border-white/10 bg-white/5"
+      }`}
+    >
       <p className="font-medium">{task.title}</p>
+      {overdue && <p className="mt-1 text-xs text-red-400">Überfällig</p>}
 
       <div className="mt-2 flex items-center gap-2">
         <select
@@ -141,6 +154,16 @@ export function TaskCard({
             </option>
           ))}
         </select>
+      </div>
+      <div className="mt-2 flex items-center gap-2 text-xs text-white/60">
+        <span>Fällig:</span>
+        <input
+          type="date"
+          defaultValue={task.dueDate ?? ""}
+          onChange={(event) => updateTask({ dueDate: event.target.value })}
+          disabled={saving}
+          className="rounded-md border border-white/20 bg-black/20 px-2 py-1"
+        />
       </div>
       <div className="mt-2 flex items-center gap-2 text-xs text-white/60">
         <span>Ist-Kosten:</span>

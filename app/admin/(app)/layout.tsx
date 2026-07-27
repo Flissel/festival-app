@@ -17,7 +17,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               Aufgaben
             </Link>
             <Link href="/admin/members" className="hover:underline">
-              Members
+              Teams &amp; Members
             </Link>
             <Link href="/admin/anfragen" className="hover:underline">
               Anfragen

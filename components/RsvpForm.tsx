@@ -7,8 +7,9 @@ type PaymentMethod = "online" | "cash";
 
 type RsvpResult = {
   guestId: string;
-  paymentMethod: PaymentMethod;
-  amount: number | null;
+  paymentMethod?: PaymentMethod;
+  amount?: number | null;
+  waitlisted?: boolean;
 };
 
 type Props = {
@@ -35,6 +36,7 @@ export function RsvpForm({ paypalClientId }: Props) {
       allergies: formData.get("allergies"),
       paymentMethod: formData.get("paymentMethod"),
       amount: paymentMethod === "online" ? formData.get("amount") : undefined,
+      website: formData.get("website"),
     };
 
     try {
@@ -63,6 +65,18 @@ export function RsvpForm({ paypalClientId }: Props) {
     }
   }
 
+  if (result?.waitlisted) {
+    return (
+      <div className="rounded-xl border border-white/10 bg-white/5 p-6">
+        <h2 className="text-xl font-semibold">Du stehst auf der Warteliste!</h2>
+        <p className="mt-2 text-white/80">
+          Wir sind aktuell voll — aber sobald ein Platz frei wird, melden wir uns sofort per
+          E-Mail bei dir. Du musst nichts weiter tun.
+        </p>
+      </div>
+    );
+  }
+
   if (result) {
     return (
       <div className="rounded-xl border border-white/10 bg-white/5 p-6">
@@ -77,7 +91,7 @@ export function RsvpForm({ paypalClientId }: Props) {
               Fast geschafft — schließe deine Anmeldung mit der Zahlung von{" "}
               {result.amount?.toFixed(2)}&nbsp;€ ab.
             </p>
-            {result.amount !== null && (
+            {result.amount != null && (
               <PaypalDonation
                 clientId={paypalClientId}
                 guestId={result.guestId}
@@ -92,6 +106,12 @@ export function RsvpForm({ paypalClientId }: Props) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
+      {/* Honeypot: für Menschen unsichtbar, Bots füllen es aus */}
+      <div aria-hidden="true" className="absolute -left-[9999px] top-auto h-px w-px overflow-hidden">
+        <label htmlFor="website">Website</label>
+        <input id="website" name="website" type="text" tabIndex={-1} autoComplete="off" />
+      </div>
+
       <div>
         <label htmlFor="name" className="block text-sm font-medium">
           Name

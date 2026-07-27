@@ -49,7 +49,9 @@ export function createMcpServer() {
 
       const lines = tasks.map(
         (task) =>
-          `- [${task.id}] "${task.title}" (${task.category.name}) — ${statusLabels[task.status]}`
+          `- [${task.id}] "${task.title}" (${task.category.name}) — ${statusLabels[task.status]}${
+            task.dueDate ? ` — fällig am ${task.dueDate.toISOString().slice(0, 10)}` : ""
+          }`
       );
       return { content: [{ type: "text", text: lines.join("\n") }] };
     }
