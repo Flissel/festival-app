@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { MarkAnsweredButton } from "@/components/admin/MarkAnsweredButton";
+import { ReplyForm } from "@/components/admin/ReplyForm";
 
 export const dynamic = "force-dynamic";
 
@@ -27,6 +28,7 @@ export default async function AdminRequestsPage() {
                 </span>
               )}
             </div>
+            {request.status === "open" && <ReplyForm requestId={request.id} />}
           </div>
         ))}
         {requests.length === 0 && (

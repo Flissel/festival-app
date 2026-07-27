@@ -1,5 +1,7 @@
 import { RsvpForm } from "@/components/RsvpForm";
 import { LocationMap } from "@/components/LocationMap";
+import { SiteFooter } from "@/components/SiteFooter";
+import { EVENT, formatEventDate } from "@/lib/event";
 
 export default function HomePage() {
   const paypalClientId = process.env.PAYPAL_CLIENT_ID ?? "";
@@ -11,7 +13,8 @@ export default function HomePage() {
           <p className="text-sm uppercase tracking-widest text-white/50">
             Du bist eingeladen
           </p>
-          <h1 className="mt-2 text-4xl font-bold">Das Festival</h1>
+          <h1 className="mt-2 text-4xl font-bold">{EVENT.name}</h1>
+          <p className="mt-3 text-lg font-medium text-white/90">{formatEventDate()}</p>
           <p className="mt-4 text-white/70">
             Bar &amp; Cocktails, Sound, Live-Acts — trag dich ein und sichere dir
             deinen Platz. Der Beitrag ist auf Spendenbasis, du entscheidest die Höhe.
@@ -29,6 +32,8 @@ export default function HomePage() {
           </a>
           .
         </p>
+
+        <SiteFooter />
       </div>
     </main>
   );

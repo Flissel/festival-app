@@ -35,6 +35,7 @@ export function NewTaskForm({
           memberId: assignment.startsWith("m:") ? assignment.slice(2) : "",
           teamId: assignment.startsWith("t:") ? assignment.slice(2) : "",
           estimatedCost: formData.get("estimatedCost"),
+          dueDate: formData.get("dueDate"),
         }),
       });
       if (response.ok) {
@@ -95,6 +96,14 @@ export function NewTaskForm({
         placeholder="Geplante Kosten € (optional)"
         className="w-full rounded-md border border-white/20 bg-black/20 px-2 py-1 text-xs"
       />
+      <label className="block text-xs text-white/60">
+        Fällig am (optional)
+        <input
+          name="dueDate"
+          type="date"
+          className="mt-1 w-full rounded-md border border-white/20 bg-black/20 px-2 py-1 text-xs"
+        />
+      </label>
       <div className="flex gap-2">
         <button
           type="submit"

@@ -3,6 +3,8 @@ import { TaskCard } from "@/components/admin/TaskCard";
 import { NewTaskForm } from "@/components/admin/NewTaskForm";
 import { NewCategoryForm } from "@/components/admin/NewCategoryForm";
 import { CategoryHeader } from "@/components/admin/CategoryHeader";
+import { TaskFilters } from "@/components/admin/TaskFilters";
+import { formatDueDate } from "@/lib/dueDate";
 
 export const dynamic = "force-dynamic";
 
@@ -12,23 +14,45 @@ const COLUMNS = [
   { status: "done" as const, label: "Erledigt" },
 ];
 
-export default async function AdminTasksPage() {
+const STATUS_VALUES = new Set(COLUMNS.map((column) => column.status as string));
+
+export default async function AdminTasksPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ status?: string; sort?: string }>;
+}) {
+  const { status, sort } = await searchParams;
+  const statusFilter = status && STATUS_VALUES.has(status) ? status : null;
+  const sortByDue = sort === "due";
+
   const [categories, members, teams] = await Promise.all([
     prisma.budgetCategory.findMany({
       orderBy: { sortOrder: "asc" },
       include: {
-        tasks: { include: { member: true, team: true }, orderBy: { createdAt: "asc" } },
+        tasks: {
+          include: { member: true, team: true },
+          orderBy: sortByDue
+            ? [{ dueDate: { sort: "asc", nulls: "last" } }, { createdAt: "asc" }]
+            : { createdAt: "asc" },
+        },
       },
     }),
     prisma.member.findMany({ orderBy: { name: "asc" } }),
     prisma.team.findMany({ orderBy: { name: "asc" }, include: { members: true } }),
   ]);
 
+  const columns = statusFilter
+    ? COLUMNS.filter((column) => column.status === statusFilter)
+    : COLUMNS;
+
   return (
     <div className="space-y-8">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold">Aufgaben</h1>
-        <NewCategoryForm />
+        <div className="flex items-center gap-4">
+          <TaskFilters />
+          <NewCategoryForm />
+        </div>
       </div>
 
       {categories.map((category) => (
@@ -41,8 +65,12 @@ export default async function AdminTasksPage() {
             />
             <NewTaskForm categoryId={category.id} members={members} teams={teams} />
           </div>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            {COLUMNS.map((column) => (
+          <div
+            className={`grid grid-cols-1 gap-4 ${
+              columns.length === 3 ? "sm:grid-cols-3" : "sm:grid-cols-1"
+            }`}
+          >
+            {columns.map((column) => (
               <div key={column.status} className="space-y-2">
                 <p className="text-xs uppercase tracking-wide text-white/40">{column.label}</p>
                 <div className="space-y-2">
@@ -64,6 +92,7 @@ export default async function AdminTasksPage() {
                           team: task.team ? { id: task.team.id, name: task.team.name } : null,
                           estimatedCost: task.estimatedCost?.toString() ?? null,
                           actualCost: task.actualCost?.toString() ?? null,
+                          dueDate: task.dueDate ? formatDueDate(task.dueDate) : null,
                         }}
                       />
                     ))}
