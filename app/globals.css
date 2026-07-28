@@ -25,17 +25,18 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-/* Kaleidoskop-Grafik: liegt hinter dem Seiteninhalt, additiv eingeblendet,
-   damit Text darüber lesbar bleibt. */
-.kaleidoscope {
-  pointer-events: none;
+/* Kaleidoskop-Scheiben: liegen hinter dem Seiteninhalt und werden additiv
+   eingeblendet, damit Text darüber lesbar bleibt. Alle teilen sich dasselbe
+   Asset — Größe, Tempo und Farbton kommen aus dem Inline-Style. */
+.kaleidoscope-disc {
+  background-image: url("/kaleidoskop.svg");
+  background-size: contain;
+  background-repeat: no-repeat;
   mix-blend-mode: screen;
-  opacity: 0.75;
-}
-
-.kaleidoscope-spin {
   transform-origin: 50% 50%;
-  animation: kaleidoscope-turn 96s linear infinite;
+  animation-name: kaleidoscope-turn;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
 }
 
 @keyframes kaleidoscope-turn {
@@ -48,7 +49,7 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .kaleidoscope-spin {
+  .kaleidoscope-disc {
     animation: none;
   }
 }

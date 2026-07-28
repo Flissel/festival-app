@@ -5,7 +5,9 @@ export function LocationMap() {
 
   return (
     <div className="mb-10">
-      <p className="mb-2 text-center text-sm text-white/60">{VENUE.label}</p>
+      <p className="mb-2 text-center text-sm text-white/80 [text-shadow:0_1px_8px_rgba(0,0,0,0.9)]">
+        {VENUE.label}
+      </p>
       <div className="overflow-hidden rounded-xl border border-white/10">
         <iframe
           src={embedSrc}
@@ -15,7 +17,7 @@ export function LocationMap() {
           referrerPolicy="no-referrer-when-downgrade"
         />
       </div>
-      <p className="mt-2 text-center text-xs text-white/40">
+      <p className="mt-2 text-center text-xs text-white/60 [text-shadow:0_1px_6px_rgba(0,0,0,0.9)]">
         <a href={VENUE.googleMapsUrl} target="_blank" rel="noopener noreferrer" className="underline">
           In Google Maps öffnen
         </a>
