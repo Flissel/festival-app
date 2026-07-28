@@ -1,17 +1,17 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { ResumePayment } from "@/components/ResumePayment";
+import { DonationBox } from "@/components/DonationBox";
 import { SiteFooter } from "@/components/SiteFooter";
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Beitrag zahlen",
+  title: "Veranstalter unterstützen",
   robots: { index: false },
 };
 
-export default async function PaymentPage({
+export default async function SupportPage({
   params,
 }: {
   params: Promise<{ guestId: string }>;
@@ -31,9 +31,10 @@ export default async function PaymentPage({
     <main className="flex min-h-screen flex-1 flex-col bg-gradient-to-b from-neutral-950 via-neutral-900 to-neutral-950 text-white">
       <div className="mx-auto w-full max-w-2xl flex-1 px-6 py-16">
         <header className="mb-10 text-center">
-          <h1 className="text-3xl font-bold">Beitrag zahlen</h1>
+          <h1 className="text-3xl font-bold">Veranstalter unterstützen</h1>
           <p className="mt-4 text-white/70">
-            Hi {guest.name} — hier kannst du deinen Festival-Beitrag per PayPal abschließen.
+            Hi {guest.name} — deine Anmeldung steht, hier ändert sich daran nichts.
+            Wenn du magst, kannst du uns freiwillig etwas dalassen.
           </p>
         </header>
 
@@ -41,20 +42,11 @@ export default async function PaymentPage({
           <div className="rounded-xl border border-white/10 bg-white/5 p-6">
             <h2 className="text-xl font-semibold">Du stehst noch auf der Warteliste</h2>
             <p className="mt-2 text-white/80">
-              Sobald dein Platz bestätigt ist, melden wir uns — dann kannst du hier deinen
-              Beitrag zahlen.
-            </p>
-          </div>
-        ) : guest.paymentStatus === "paid" ? (
-          <div className="rounded-xl border border-emerald-400/40 bg-emerald-400/10 p-6">
-            <h2 className="text-xl font-semibold text-emerald-300">Alles erledigt!</h2>
-            <p className="mt-2 text-white/80">
-              Dein Beitrag ist bereits eingegangen — vielen Dank! Wir sehen uns auf dem
-              Festival.
+              Sobald dein Platz bestätigt ist, melden wir uns bei dir.
             </p>
           </div>
         ) : (
-          <ResumePayment
+          <DonationBox
             paypalClientId={paypalClientId}
             guestId={guest.id}
             defaultAmount={lastPendingAmount !== null ? Number(lastPendingAmount) : null}

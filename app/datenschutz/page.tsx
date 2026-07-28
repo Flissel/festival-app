@@ -34,17 +34,16 @@ export default function DatenschutzPage() {
             </h2>
             <ul className="mt-2 list-disc space-y-1 pl-5">
               <li>
-                <strong>Anmeldung:</strong> Name, E-Mail-Adresse, optional Telefonnummer,
-                Anzahl Begleitpersonen sowie freiwillige Angaben zu Allergien /
-                Unverträglichkeiten.
+                <strong>Anmeldung:</strong> Name, E-Mail-Adresse und Anzahl der
+                Begleitpersonen — mehr erheben wir nicht.
               </li>
               <li>
                 <strong>Kontaktformular:</strong> Name, E-Mail-Adresse und deine Nachricht.
               </li>
               <li>
-                <strong>Zahlung:</strong> Bei Online-Zahlung wird die Zahlung über PayPal
-                abgewickelt; wir speichern den Zahlungsstatus und den Betrag. Es gelten
-                zusätzlich die Datenschutzhinweise von PayPal.
+                <strong>Freiwillige Unterstützung:</strong> Nur wenn du uns per PayPal
+                unterstützt, speichern wir Betrag und Zahlungsstatus. Die Zahlung selbst
+                wickelt PayPal ab; dort gelten zusätzlich deren Datenschutzhinweise.
               </li>
             </ul>
           </div>
@@ -53,9 +52,8 @@ export default function DatenschutzPage() {
             <h2 className="text-lg font-semibold text-white">Zweck und Rechtsgrundlage</h2>
             <p className="mt-2">
               Wir nutzen die Daten ausschließlich zur Organisation dieser Veranstaltung
-              (Gästeliste, Zahlungsabgleich, Verpflegungsplanung, Rückfragen). Rechtsgrundlage
-              ist Art. 6 Abs. 1 lit. b DSGVO (Durchführung der Anmeldung) bzw. lit. a DSGVO
-              (freiwillige Angaben wie Allergien).
+              (Gästeliste, Planung, Rückfragen). Rechtsgrundlage ist Art. 6 Abs. 1 lit. b
+              DSGVO (Durchführung der Anmeldung).
             </p>
           </div>
 

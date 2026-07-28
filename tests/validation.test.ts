@@ -6,37 +6,40 @@ describe("rsvpSchema", () => {
   const base = {
     name: "Alex",
     email: "alex@example.com",
-    phone: "",
     plusOnes: "2",
-    allergies: "",
   };
 
-  it("akzeptiert eine Online-Anmeldung mit Betrag", () => {
-    const result = rsvpSchema.safeParse({ ...base, paymentMethod: "online", amount: "15" });
+  it("akzeptiert eine Anmeldung und wandelt plusOnes in eine Zahl", () => {
+    const result = rsvpSchema.safeParse(base);
     expect(result.success).toBe(true);
     if (result.success) {
       expect(result.data.plusOnes).toBe(2);
-      expect(result.data.amount).toBe(15);
     }
   });
 
-  it("verlangt bei Online-Zahlung einen Betrag", () => {
-    const result = rsvpSchema.safeParse({ ...base, paymentMethod: "online" });
-    expect(result.success).toBe(false);
-  });
-
-  it("akzeptiert Barzahlung ohne Betrag", () => {
-    expect(rsvpSchema.safeParse({ ...base, paymentMethod: "cash" }).success).toBe(true);
-  });
-
   it("lehnt eine ungültige E-Mail ab", () => {
-    const result = rsvpSchema.safeParse({ ...base, email: "keine-mail", paymentMethod: "cash" });
-    expect(result.success).toBe(false);
+    expect(rsvpSchema.safeParse({ ...base, email: "keine-mail" }).success).toBe(false);
   });
 
   it("lehnt negative Begleitpersonen ab", () => {
-    const result = rsvpSchema.safeParse({ ...base, plusOnes: "-1", paymentMethod: "cash" });
-    expect(result.success).toBe(false);
+    expect(rsvpSchema.safeParse({ ...base, plusOnes: "-1" }).success).toBe(false);
+  });
+
+  it("lehnt einen leeren Namen ab", () => {
+    expect(rsvpSchema.safeParse({ ...base, name: "   " }).success).toBe(false);
+  });
+
+  it("ignoriert nicht mehr erhobene Felder wie Telefon und Allergien", () => {
+    const result = rsvpSchema.safeParse({
+      ...base,
+      phone: "+4917012345678",
+      allergies: "Nüsse",
+    });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data).not.toHaveProperty("phone");
+      expect(result.data).not.toHaveProperty("allergies");
+    }
   });
 });
 

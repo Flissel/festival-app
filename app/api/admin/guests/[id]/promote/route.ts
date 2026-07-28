@@ -20,7 +20,6 @@ export async function POST(_request: NextRequest, { params }: { params: Promise<
     to: guest.email,
     name: guest.name,
     guestId: guest.id,
-    paymentMethod: guest.paymentStatus === "cash_pending" ? "cash" : "online",
   }).catch(() => {});
 
   logger.info("admin.guest_promoted", { guestId: id });
