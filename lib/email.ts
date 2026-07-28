@@ -39,7 +39,10 @@ export async function sendRsvpConfirmation(params: {
 
   const base = appBaseUrl();
   const supportBlock = base
-    ? `\nFalls du uns freiwillig unterstützen möchtest, geht das hier — nötig ist es nicht:\n${base}/zahlung/${params.guestId}\n`
+    ? `\nWir stemmen das Festival privat und zahlen DJs, Live-Acts, Essen, Getränke
+und Technik vor. Falls du uns freiwillig unterstützen möchtest, geht das hier
+— nötig ist es nicht:
+${base}/zahlung/${params.guestId}\n`
     : "";
 
   const text = `Hi ${params.name},
