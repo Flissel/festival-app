@@ -5,6 +5,13 @@ import { PaypalDonation } from "@/components/PaypalDonation";
 
 const PRESETS = [10, 20, 50];
 
+const USES = [
+  "DJs und Live-Acts",
+  "Essen",
+  "Getränke und Bar",
+  "Sound, Licht und Technik",
+];
+
 type Props = {
   paypalClientId: string;
   guestId: string;
@@ -24,8 +31,9 @@ export function DonationBox({ paypalClientId, guestId, defaultAmount = null }: P
     return (
       <div className="mt-6 rounded-xl border border-white/10 bg-white/5 p-5 text-center">
         <p className="text-sm text-white/70">
-          Das Festival stemmen wir privat. Wer mag, kann die Veranstalter freiwillig
-          unterstützen — nötig ist das nicht, du bist so oder so dabei.
+          Wir stemmen das Festival privat. Damit DJs, Live-Acts und Bar nicht alles
+          umsonst machen müssen, freuen wir uns über einen freiwilligen Beitrag —
+          nötig ist er nicht, du bist so oder so dabei.
         </p>
         <button
           type="button"
@@ -42,7 +50,20 @@ export function DonationBox({ paypalClientId, guestId, defaultAmount = null }: P
     <div className="mt-6 rounded-xl border border-white/10 bg-white/5 p-5">
       <p className="text-sm font-medium">Veranstalter unterstützen</p>
       <p className="mt-1 text-sm text-white/60">
-        Betrag frei wählbar — jeder Beitrag hilft bei Getränken, Technik und Deko.
+        Hinter dem Festival steckt einiges an Aufwand und Vorkasse. Davon bezahlen wir:
+      </p>
+      <ul className="mt-2 space-y-1 text-sm text-white/70">
+        {USES.map((use) => (
+          <li key={use} className="flex items-start gap-2">
+            <span aria-hidden="true" className="text-white/40">
+              •
+            </span>
+            {use}
+          </li>
+        ))}
+      </ul>
+      <p className="mt-3 text-sm text-white/60">
+        Betrag frei wählbar — jeder Euro hilft.
       </p>
 
       <div className="mt-3 flex flex-wrap gap-2">
