@@ -24,3 +24,31 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Kaleidoskop-Grafik: liegt hinter dem Seiteninhalt, additiv eingeblendet,
+   damit Text darüber lesbar bleibt. */
+.kaleidoscope {
+  pointer-events: none;
+  mix-blend-mode: screen;
+  opacity: 0.75;
+}
+
+.kaleidoscope-spin {
+  transform-origin: 50% 50%;
+  animation: kaleidoscope-turn 96s linear infinite;
+}
+
+@keyframes kaleidoscope-turn {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kaleidoscope-spin {
+    animation: none;
+  }
+}

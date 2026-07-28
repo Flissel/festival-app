@@ -10,15 +10,15 @@ type Guest = {
   email: string;
   phone: string | null;
   plusOnes: number;
-  allergies: string | null;
   paymentStatus: "pending" | "cash_pending" | "paid";
   waitlisted: boolean;
 };
 
+// Der Beitrag ist freiwillig — "offen" heißt hier schlicht: noch nichts erfasst.
 const statusLabels: Record<Guest["paymentStatus"], string> = {
-  pending: "Online ausstehend",
-  cash_pending: "Bar ausstehend",
-  paid: "Bezahlt",
+  pending: "—",
+  cash_pending: "Bar zugesagt",
+  paid: "Hat unterstützt",
 };
 
 const inputClass =
@@ -45,7 +45,6 @@ export function GuestRow({ guest }: { guest: Guest }) {
           email: formData.get("email"),
           phone: formData.get("phone"),
           plusOnes: formData.get("plusOnes"),
-          allergies: formData.get("allergies"),
         }),
       });
       if (!response.ok) {
@@ -93,7 +92,7 @@ export function GuestRow({ guest }: { guest: Guest }) {
   if (editing) {
     return (
       <tr className="border-t border-white/10">
-        <td colSpan={7} className="px-4 py-3">
+        <td colSpan={6} className="px-4 py-3">
           <form onSubmit={handleSave} className="flex flex-wrap items-end gap-3">
             <label className="flex-1 min-w-40 text-xs text-white/60">
               Name
@@ -110,10 +109,6 @@ export function GuestRow({ guest }: { guest: Guest }) {
             <label className="w-24 text-xs text-white/60">
               Begleitung
               <input name="plusOnes" type="number" min={0} max={20} defaultValue={guest.plusOnes} required className={inputClass} />
-            </label>
-            <label className="flex-1 min-w-40 text-xs text-white/60">
-              Allergien
-              <input name="allergies" defaultValue={guest.allergies ?? ""} className={inputClass} />
             </label>
             <div className="flex gap-2">
               <button
@@ -144,7 +139,6 @@ export function GuestRow({ guest }: { guest: Guest }) {
       <td className="px-4 py-2">{guest.email}</td>
       <td className="px-4 py-2">{guest.phone ?? "—"}</td>
       <td className="px-4 py-2">{guest.plusOnes}</td>
-      <td className="px-4 py-2">{guest.allergies ?? "—"}</td>
       <td className="px-4 py-2">
         {guest.waitlisted ? (
           <span className="rounded-md bg-amber-400/10 px-2 py-1 text-xs text-amber-300">
@@ -166,7 +160,7 @@ export function GuestRow({ guest }: { guest: Guest }) {
               Nachrücken
             </button>
           )}
-          {!guest.waitlisted && guest.paymentStatus === "cash_pending" && (
+          {!guest.waitlisted && guest.paymentStatus !== "paid" && (
             <MarkPaidForm guestId={guest.id} />
           )}
           <button

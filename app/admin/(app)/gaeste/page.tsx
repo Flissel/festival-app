@@ -9,7 +9,6 @@ type GuestRecord = {
   email: string;
   phone: string | null;
   plusOnes: number;
-  allergies: string | null;
   paymentStatus: "pending" | "cash_pending" | "paid";
   waitlisted: boolean;
 };
@@ -17,14 +16,13 @@ type GuestRecord = {
 function GuestTable({ guests, emptyText }: { guests: GuestRecord[]; emptyText: string }) {
   return (
     <div className="overflow-x-auto rounded-xl border border-white/10">
-      <table className="w-full min-w-[860px] text-sm">
+      <table className="w-full min-w-[760px] text-sm">
         <thead className="bg-white/5 text-left text-white/60">
           <tr>
             <th className="px-4 py-2">Name</th>
             <th className="px-4 py-2">E-Mail</th>
             <th className="px-4 py-2">Telefon</th>
             <th className="px-4 py-2">+Begleitung</th>
-            <th className="px-4 py-2">Allergien</th>
             <th className="px-4 py-2">Status</th>
             <th className="px-4 py-2"></th>
           </tr>
@@ -35,7 +33,7 @@ function GuestTable({ guests, emptyText }: { guests: GuestRecord[]; emptyText: s
           ))}
           {guests.length === 0 && (
             <tr>
-              <td colSpan={7} className="px-4 py-6 text-center text-white/40">
+              <td colSpan={6} className="px-4 py-6 text-center text-white/40">
                 {emptyText}
               </td>
             </tr>
@@ -55,7 +53,6 @@ export default async function AdminGuestsPage() {
     email: guest.email,
     phone: guest.phone,
     plusOnes: guest.plusOnes,
-    allergies: guest.allergies,
     paymentStatus: guest.paymentStatus,
     waitlisted: guest.waitlisted,
   });

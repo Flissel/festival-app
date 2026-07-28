@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
 
   if (isHoneypotFilled(body)) {
     logger.warn("rsvp.honeypot_triggered", { ip });
-    return NextResponse.json({ guestId: "ok", paymentMethod: "cash", amount: null });
+    return NextResponse.json({ guestId: "ok" });
   }
 
   const parsed = rsvpSchema.safeParse(body);
@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const { name, email, phone, plusOnes, allergies, paymentMethod, amount } = parsed.data;
+  const { name, email, plusOnes } = parsed.data;
 
   const existing = await prisma.guest.findFirst({
     where: { email: { equals: email, mode: "insensitive" } },
@@ -65,35 +65,17 @@ export async function POST(request: NextRequest) {
   }
 
   const guest = await prisma.guest.create({
-    data: {
-      name,
-      email,
-      phone: phone || null,
-      plusOnes,
-      allergies: allergies || null,
-      paymentStatus: paymentMethod === "cash" ? "cash_pending" : "pending",
-      waitlisted,
-    },
+    data: { name, email, plusOnes, waitlisted },
   });
 
-  logger.info("rsvp.created", { guestId: guest.id, paymentMethod, waitlisted });
+  logger.info("rsvp.created", { guestId: guest.id, waitlisted });
 
   if (waitlisted) {
     sendWaitlistConfirmation({ to: email, name }).catch(() => {});
     return NextResponse.json({ guestId: guest.id, waitlisted: true });
   }
 
-  sendRsvpConfirmation({
-    to: email,
-    name,
-    guestId: guest.id,
-    paymentMethod,
-    amount: amount ?? null,
-  }).catch(() => {});
+  sendRsvpConfirmation({ to: email, name, guestId: guest.id }).catch(() => {});
 
-  return NextResponse.json({
-    guestId: guest.id,
-    paymentMethod,
-    amount: amount ?? null,
-  });
+  return NextResponse.json({ guestId: guest.id });
 }

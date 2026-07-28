@@ -8,7 +8,6 @@ const updateSchema = z.object({
   email: z.string().trim().email("Ungültige E-Mail-Adresse"),
   phone: z.string().trim().max(50).optional().or(z.literal("")),
   plusOnes: z.coerce.number().int().min(0).max(20),
-  allergies: z.string().trim().max(500).optional().or(z.literal("")),
 });
 
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -27,16 +26,10 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     return NextResponse.json({ error: "Gast nicht gefunden" }, { status: 404 });
   }
 
-  const { name, email, phone, plusOnes, allergies } = parsed.data;
+  const { name, email, phone, plusOnes } = parsed.data;
   await prisma.guest.update({
     where: { id },
-    data: {
-      name,
-      email,
-      phone: phone || null,
-      plusOnes,
-      allergies: allergies || null,
-    },
+    data: { name, email, phone: phone || null, plusOnes },
   });
 
   logger.info("admin.guest_updated", { guestId: id });

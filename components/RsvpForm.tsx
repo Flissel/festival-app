@@ -1,14 +1,10 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { PaypalDonation } from "@/components/PaypalDonation";
-
-type PaymentMethod = "online" | "cash";
+import { DonationBox } from "@/components/DonationBox";
 
 type RsvpResult = {
   guestId: string;
-  paymentMethod?: PaymentMethod;
-  amount?: number | null;
   waitlisted?: boolean;
 };
 
@@ -17,7 +13,6 @@ type Props = {
 };
 
 export function RsvpForm({ paypalClientId }: Props) {
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("online");
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [result, setResult] = useState<RsvpResult | null>(null);
@@ -31,11 +26,7 @@ export function RsvpForm({ paypalClientId }: Props) {
     const payload = {
       name: formData.get("name"),
       email: formData.get("email"),
-      phone: formData.get("phone"),
       plusOnes: formData.get("plusOnes"),
-      allergies: formData.get("allergies"),
-      paymentMethod: formData.get("paymentMethod"),
-      amount: paymentMethod === "online" ? formData.get("amount") : undefined,
       website: formData.get("website"),
     };
 
@@ -70,8 +61,8 @@ export function RsvpForm({ paypalClientId }: Props) {
       <div className="rounded-xl border border-white/10 bg-white/5 p-6">
         <h2 className="text-xl font-semibold">Du stehst auf der Warteliste!</h2>
         <p className="mt-2 text-white/80">
-          Wir sind aktuell voll — aber sobald ein Platz frei wird, melden wir uns sofort per
-          E-Mail bei dir. Du musst nichts weiter tun.
+          Wir sind aktuell voll — aber sobald ein Platz frei wird, melden wir uns sofort
+          per E-Mail bei dir. Du musst nichts weiter tun.
         </p>
       </div>
     );
@@ -79,27 +70,16 @@ export function RsvpForm({ paypalClientId }: Props) {
 
   if (result) {
     return (
-      <div className="rounded-xl border border-white/10 bg-white/5 p-6">
-        <h2 className="text-xl font-semibold">Danke für deine Anmeldung!</h2>
-        {result.paymentMethod === "cash" ? (
+      <div>
+        <div className="rounded-xl border border-white/10 bg-white/5 p-6">
+          <h2 className="text-xl font-semibold">Du bist dabei!</h2>
           <p className="mt-2 text-white/80">
-            Wir haben dich eingetragen. Du zahlst deinen Beitrag bar vor Ort.
+            Wir haben dich eingetragen und dir eine Bestätigung geschickt. Mehr musst
+            du nicht tun — wir sehen uns vor Ort.
           </p>
-        ) : (
-          <div className="mt-4">
-            <p className="text-white/80">
-              Fast geschafft — schließe deine Anmeldung mit der Zahlung von{" "}
-              {result.amount?.toFixed(2)}&nbsp;€ ab.
-            </p>
-            {result.amount != null && (
-              <PaypalDonation
-                clientId={paypalClientId}
-                guestId={result.guestId}
-                amount={result.amount}
-              />
-            )}
-          </div>
-        )}
+        </div>
+
+        <DonationBox paypalClientId={paypalClientId} guestId={result.guestId} />
       </div>
     );
   }
@@ -136,18 +116,7 @@ export function RsvpForm({ paypalClientId }: Props) {
           required
           className="mt-1 w-full rounded-md border border-white/20 bg-black/20 px-3 py-2"
         />
-      </div>
-
-      <div>
-        <label htmlFor="phone" className="block text-sm font-medium">
-          Telefon (optional)
-        </label>
-        <input
-          id="phone"
-          name="phone"
-          type="tel"
-          className="mt-1 w-full rounded-md border border-white/20 bg-black/20 px-3 py-2"
-        />
+        <p className="mt-1 text-xs text-white/40">Nur für die Bestätigung deiner Anmeldung.</p>
       </div>
 
       <div>
@@ -166,69 +135,14 @@ export function RsvpForm({ paypalClientId }: Props) {
         />
       </div>
 
-      <div>
-        <label htmlFor="allergies" className="block text-sm font-medium">
-          Allergien / Unverträglichkeiten (optional)
-        </label>
-        <textarea
-          id="allergies"
-          name="allergies"
-          rows={2}
-          className="mt-1 w-full rounded-md border border-white/20 bg-black/20 px-3 py-2"
-        />
-      </div>
-
-      <fieldset>
-        <legend className="block text-sm font-medium">Wie möchtest du beitragen?</legend>
-        <div className="mt-2 space-y-2">
-          <label className="flex items-center gap-2">
-            <input
-              type="radio"
-              name="paymentMethod"
-              value="online"
-              checked={paymentMethod === "online"}
-              onChange={() => setPaymentMethod("online")}
-            />
-            Online per PayPal
-          </label>
-          <label className="flex items-center gap-2">
-            <input
-              type="radio"
-              name="paymentMethod"
-              value="cash"
-              checked={paymentMethod === "cash"}
-              onChange={() => setPaymentMethod("cash")}
-            />
-            Bar vor Ort
-          </label>
-        </div>
-      </fieldset>
-
-      {paymentMethod === "online" && (
-        <div>
-          <label htmlFor="amount" className="block text-sm font-medium">
-            Dein Beitrag (frei wählbar, in €)
-          </label>
-          <input
-            id="amount"
-            name="amount"
-            type="number"
-            min={1}
-            step="0.01"
-            required
-            className="mt-1 w-full rounded-md border border-white/20 bg-black/20 px-3 py-2"
-          />
-        </div>
-      )}
-
       {errorMessage && <p className="text-sm text-red-400">{errorMessage}</p>}
 
       <p className="text-xs text-white/40">
-        Deine Angaben werden ausschließlich zur Organisation dieses Events genutzt (Gästeliste,
-        Zahlungsabgleich, Verpflegungsplanung) und nicht an Dritte weitergegeben. Fragen zu
-        deinen Daten? Schreib uns über{" "}
-        <a href="/anfrage" className="underline">
-          das Kontaktformular
+        Wir speichern nur Name, E-Mail-Adresse und die Anzahl der Begleitpersonen —
+        ausschließlich zur Organisation dieses Events und nicht an Dritte weitergegeben.
+        Details in unserer{" "}
+        <a href="/datenschutz" className="underline">
+          Datenschutzerklärung
         </a>
         .
       </p>

@@ -30,8 +30,6 @@ export async function sendRsvpConfirmation(params: {
   to: string;
   name: string;
   guestId: string;
-  paymentMethod: "online" | "cash";
-  amount: number | null;
 }): Promise<void> {
   const transport = getTransport();
   if (!transport) {
@@ -39,25 +37,15 @@ export async function sendRsvpConfirmation(params: {
     return;
   }
 
-  const paymentLine =
-    params.paymentMethod === "cash"
-      ? "Du zahlst deinen Beitrag bar vor Ort."
-      : params.amount
-        ? `Dein Beitrag von ${params.amount.toFixed(2)} € wird online über PayPal abgewickelt.`
-        : "Dein Beitrag wird online über PayPal abgewickelt.";
-
   const base = appBaseUrl();
-  const paymentLinkBlock =
-    params.paymentMethod === "online" && base
-      ? `\nZahlung noch nicht abgeschlossen oder unterbrochen? Hier kannst du sie jederzeit nachholen:\n${base}/zahlung/${params.guestId}\n`
-      : "";
+  const supportBlock = base
+    ? `\nFalls du uns freiwillig unterstützen möchtest, geht das hier — nötig ist es nicht:\n${base}/zahlung/${params.guestId}\n`
+    : "";
 
   const text = `Hi ${params.name},
 
-danke für deine Anmeldung zum Festival!
-
-${paymentLine}
-${paymentLinkBlock}
+du bist dabei — wir haben dich eingetragen!
+${supportBlock}
 ${eventInfoBlock()}
 
 Fragen? Antworte einfach auf diese E-Mail oder nutze unser Kontaktformular.
@@ -118,7 +106,6 @@ export async function sendWaitlistPromotion(params: {
   to: string;
   name: string;
   guestId: string;
-  paymentMethod: "online" | "cash";
 }): Promise<void> {
   const transport = getTransport();
   if (!transport) {
@@ -127,19 +114,14 @@ export async function sendWaitlistPromotion(params: {
   }
 
   const base = appBaseUrl();
-  const paymentBlock =
-    params.paymentMethod === "cash"
-      ? "Deinen Beitrag zahlst du bar vor Ort."
-      : base
-        ? `Deinen Beitrag kannst du hier per PayPal zahlen:\n${base}/zahlung/${params.guestId}`
-        : "Deinen Beitrag kannst du per PayPal zahlen — den Link schicken wir dir separat.";
+  const supportBlock = base
+    ? `\nFalls du uns freiwillig unterstützen möchtest, geht das hier:\n${base}/zahlung/${params.guestId}\n`
+    : "";
 
   const text = `Hi ${params.name},
 
 gute Nachrichten: Ein Platz ist frei geworden — du bist jetzt fest angemeldet! 🎉
-
-${paymentBlock}
-
+${supportBlock}
 ${eventInfoBlock()}
 
 Bis bald!`;
