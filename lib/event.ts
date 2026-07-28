@@ -1,8 +1,10 @@
 export const EVENT = {
   name: "Das Festival",
-  // Sobald der Termin feststeht, hier eintragen — erscheint auf der Einladung
-  // und in der Bestätigungsmail. Beispiel: "Samstag, 15. August 2026, ab 16 Uhr"
-  dateLabel: null as string | null,
+  // Erscheint auf der Einladung, im OG-Bild und in der Bestätigungsmail.
+  dateLabel: "Samstag, 29. August 2026" as string | null,
+  // Sobald die Acts feststehen, hier durch die Namen ersetzen — oder auf null
+  // setzen, dann verschwindet die Zeile.
+  lineupNote: "Line-up folgt" as string | null,
 };
 
 export function formatEventDate(): string {

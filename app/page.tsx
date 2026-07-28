@@ -28,6 +28,11 @@ export default function HomePage() {
           <p className="mt-3 text-lg font-medium text-white/90 [text-shadow:0_1px_8px_rgba(0,0,0,0.8)]">
             {formatEventDate()}
           </p>
+          {EVENT.lineupNote && (
+            <p className="mt-2 inline-block rounded-full border border-white/25 bg-black/30 px-3 py-1 text-xs uppercase tracking-wider text-white/70">
+              {EVENT.lineupNote}
+            </p>
+          )}
           <p className="mt-4 text-white/80 [text-shadow:0_1px_8px_rgba(0,0,0,0.9)]">
             Bar &amp; Cocktails, Sound, Live-Acts. Trag dich kurz ein, damit wir
             wissen, mit wie vielen wir planen dürfen — mehr brauchen wir nicht.
