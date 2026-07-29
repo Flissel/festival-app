@@ -35,9 +35,15 @@ Nodemailer (Gmail) · PayPal REST API
 npm install
 cp .env.example .env   # Werte eintragen, siehe Kommentare in der Datei
 npx prisma migrate dev # legt die Datenbank an
-npm run db:seed        # Standard-Budgetkategorien
+npm run db:seed        # Orga-Plan als Kategorien + Aufgaben
 npm run dev
 ```
+
+Der Seed spielt den Orga-Plan aus `lib/orgaPlan.ts` ein (Getränke, Essen, Musik,
+die einzelnen Areas und die Ideensammlung). Er ist idempotent: Kategorien und
+Aufgaben werden am Namen wiedererkannt, ein erneuter Lauf legt nichts doppelt an
+und überschreibt keine Änderungen aus dem Admin. Wächst der Plan, kommen die
+neuen Zeilen einfach in `lib/orgaPlan.ts` und der Seed läuft nochmal.
 
 Admin-Passwort-Hash für `ADMIN_PASSWORD_HASH` erzeugen:
 
@@ -84,3 +90,10 @@ Das Projekt ist für Vercel mit einer Postgres-Datenbank (z. B. Neon) ausgelegt.
 werden also beim Deploy automatisch angewendet. Nach dem ersten Deploy einmalig
 `npm run db:seed` gegen die Produktions-Datenbank ausführen und den PayPal-Webhook
 (`PAYMENT.CAPTURE.COMPLETED` → `/api/paypal/webhook`) in der PayPal-Konsole anlegen.
+
+Den Seed gegen die Datenbank einer Vercel-Umgebung laufen lassen:
+
+```bash
+npx vercel env pull .env   # holt DATABASE_URL der verknüpften Umgebung
+npm run db:seed
+```
