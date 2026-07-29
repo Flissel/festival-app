@@ -33,10 +33,32 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Zahlung nicht abgeschlossen" }, { status: 409 });
     }
 
+    const unit = result.purchaseUnits[0];
+    const capturedAmount = unit?.amount ? Number(unit.amount) : null;
+    const expectedAmount = Number(payment.amount);
+
+    // Gebucht werden soll genau der Betrag, für den die Order angelegt wurde.
+    // Weicht er ab, wird die Zahlung trotzdem verbucht — das Geld ist ja da —,
+    // aber die Abweichung muss im Protokoll stehen, sonst stimmt die Kasse
+    // später nicht und niemand weiß warum.
+    if (capturedAmount !== null && Math.abs(capturedAmount - expectedAmount) > 0.001) {
+      logger.error("paypal.capture_amount_mismatch", {
+        orderId,
+        paymentId: payment.id,
+        expected: expectedAmount,
+        captured: capturedAmount,
+      });
+    }
+
     await prisma.$transaction([
       prisma.payment.update({
         where: { id: payment.id },
-        data: { status: "completed", completedAt: new Date() },
+        data: {
+          status: "completed",
+          completedAt: new Date(),
+          paypalCaptureId: unit?.captureId ?? null,
+          ...(capturedAmount !== null ? { amount: capturedAmount } : {}),
+        },
       }),
       prisma.guest.update({
         where: { id: payment.guestId },

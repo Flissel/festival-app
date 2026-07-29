@@ -12,6 +12,7 @@
 
 import type { PrismaClient } from "@/app/generated/prisma/client";
 import { parseDueDate } from "@/lib/dueDate";
+import { isUniqueViolation } from "@/lib/prismaError";
 
 export const EVENT_DAY = "2026-08-29";
 
@@ -113,11 +114,22 @@ export async function importOrgaPlan(db: PrismaClient): Promise<ImportResult> {
     });
 
     if (!category) {
-      category = await db.budgetCategory.create({
-        data: { name: planCategory.name, sortOrder: nextSortOrder },
-      });
-      nextSortOrder += 1;
-      createdCategories += 1;
+      try {
+        category = await db.budgetCategory.create({
+          data: { name: planCategory.name, sortOrder: nextSortOrder },
+        });
+        nextSortOrder += 1;
+        createdCategories += 1;
+      } catch (error) {
+        // Zwei gleichzeitige Importe (zwei Admins tippen denselben Button)
+        // kommen beide am Existenz-Check vorbei. Die Eindeutigkeit in der
+        // Datenbank lässt nur einen durch; der andere nimmt einfach das
+        // Ergebnis des Ersten.
+        if (!isUniqueViolation(error)) throw error;
+        category = await db.budgetCategory.findFirstOrThrow({
+          where: { name: planCategory.name },
+        });
+      }
     }
 
     for (const task of planCategory.tasks) {
@@ -126,14 +138,20 @@ export async function importOrgaPlan(db: PrismaClient): Promise<ImportResult> {
       });
       if (existing) continue;
 
-      await db.task.create({
-        data: {
-          categoryId: category.id,
-          title: task.title,
-          dueDate: parseDueDate(task.dueDate),
-        },
-      });
-      createdTasks += 1;
+      try {
+        await db.task.create({
+          data: {
+            categoryId: category.id,
+            title: task.title,
+            dueDate: parseDueDate(task.dueDate),
+          },
+        });
+        createdTasks += 1;
+      } catch (error) {
+        // Gleiches Rennen eine Ebene tiefer — wenn die Aufgabe inzwischen von
+        // jemand anderem angelegt wurde, ist das Ziel ja erreicht.
+        if (!isUniqueViolation(error)) throw error;
+      }
     }
   }
 

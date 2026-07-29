@@ -3,6 +3,8 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { notifyTaskAssignment } from "@/lib/taskNotifications";
 import { parseDueDate } from "@/lib/dueDate";
+import { recordAudit, AUDIT_ADMIN } from "@/lib/audit";
+import { isUniqueViolation } from "@/lib/prismaError";
 
 const bodySchema = z.object({
   categoryId: z.string().min(1),
@@ -45,15 +47,37 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  const task = await prisma.task.create({
-    data: {
-      categoryId,
-      title,
-      memberId: memberId || null,
-      teamId: teamId || null,
-      estimatedCost: estimatedCost === "" || estimatedCost === undefined ? null : estimatedCost,
-      dueDate: parseDueDate(dueDate || undefined),
-    },
+  let task;
+  try {
+    task = await prisma.task.create({
+      data: {
+        categoryId,
+        title,
+        memberId: memberId || null,
+        teamId: teamId || null,
+        estimatedCost: estimatedCost === "" || estimatedCost === undefined ? null : estimatedCost,
+        dueDate: parseDueDate(dueDate || undefined),
+      },
+    });
+  } catch (error) {
+    // Titel sind je Kategorie eindeutig — sonst weiß niemand mehr, welche der
+    // zwei gleichnamigen Aufgaben im Chat gemeint ist.
+    if (isUniqueViolation(error)) {
+      return NextResponse.json(
+        { error: `In „${category.name}" gibt es „${title}" schon.` },
+        { status: 409 }
+      );
+    }
+    throw error;
+  }
+
+  await recordAudit({
+    source: "admin",
+    actor: AUDIT_ADMIN,
+    action: "task.create",
+    entity: "Task",
+    entityId: task.id,
+    summary: `„${title}" in „${category.name}" angelegt`,
   });
 
   if (memberId || teamId) {

@@ -60,7 +60,11 @@ export async function POST(request: NextRequest) {
     await prisma.$transaction([
       prisma.payment.update({
         where: { id: payment.id },
-        data: { status: "completed", completedAt: new Date() },
+        data: {
+          status: "completed",
+          completedAt: new Date(),
+          paypalCaptureId: event.resource.id,
+        },
       }),
       prisma.guest.update({
         where: { id: payment.guestId },
