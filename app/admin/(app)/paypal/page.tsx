@@ -99,8 +99,8 @@ export default async function AdminPaypalPage() {
               ok={health.webhookConfigured}
               detail={
                 health.webhookConfigured
-                  ? "PAYPAL_WEBHOOK_ID ist gesetzt — Zahlungen werden auch dann verbucht, wenn der Gast den Browser zu früh schließt"
-                  : "PAYPAL_WEBHOOK_ID fehlt. Ohne Webhook wird eine Zahlung nur verbucht, wenn der Gast die Seite bis zum Ende offen lässt."
+                  ? "PAYPAL_WEBHOOK_ID ist gesetzt — PayPal meldet abgeschlossene Buchungen auch dann, wenn die App das Ergebnis der Zahlung nicht mitbekommen hat"
+                  : "PAYPAL_WEBHOOK_ID fehlt. Der Webhook ist die Absicherung für den seltenen Fall, dass PayPal das Geld einzieht, die App das Ergebnis aber nicht mehr verbuchen kann — dann bliebe eine bezahlte Spende hier unsichtbar."
               }
             />
           </tbody>
@@ -168,6 +168,17 @@ export default async function AdminPaypalPage() {
             </tbody>
           </table>
         </div>
+
+        {/* „offen" ist der häufigste Zustand und wird am leichtesten
+            missverstanden: Da wurde kein Geld eingezogen. */}
+        {payments.some((payment) => payment.status !== "completed") && (
+          <p className="mt-3 text-sm text-white/60">
+            <span className="text-white/80">&bdquo;offen&ldquo;</span> heißt: Die Bestellung wurde
+            angelegt, aber nie abgeschlossen — der Gast hat den Vorgang abgebrochen oder
+            das Fenster geschlossen. Es wurde <strong>kein Geld eingezogen</strong>. Solche
+            Zeilen können stehen bleiben; sie zählen weder zur Summe noch zum Kassenstand.
+          </p>
+        )}
       </div>
     </div>
   );
