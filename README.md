@@ -39,11 +39,20 @@ npm run db:seed        # Orga-Plan als Kategorien + Aufgaben
 npm run dev
 ```
 
-Der Seed spielt den Orga-Plan aus `lib/orgaPlan.ts` ein (Getränke, Essen, Musik,
-die einzelnen Areas und die Ideensammlung). Er ist idempotent: Kategorien und
-Aufgaben werden am Namen wiedererkannt, ein erneuter Lauf legt nichts doppelt an
-und überschreibt keine Änderungen aus dem Admin. Wächst der Plan, kommen die
-neuen Zeilen einfach in `lib/orgaPlan.ts` und der Seed läuft nochmal.
+### Orga-Plan
+
+Der abgestimmte Orga-Plan steht als Daten in `lib/orgaPlan.ts` — 9 Kategorien
+(Getränke, Essen, Musik, die vier Areas, Steg, Ideen) mit 33 Aufgaben. In die
+Datenbank kommt er auf zwei Wegen, die dieselbe Funktion benutzen:
+
+- **Im Admin** unter *Aufgaben* → Button „Orga-Plan einspielen". Kein Terminal
+  und keine Datenbank-Zugangsdaten nötig; danach sehen ihn alle Admins.
+- **Per Kommandozeile** mit `npm run db:seed`.
+
+Beides ist idempotent: Kategorien und Aufgaben werden am Namen wiedererkannt,
+ein zweiter Lauf ergänzt nur, was neu ist, und fasst Status, Zuweisungen und
+Kosten aus dem Admin nicht an. Wächst der Plan, kommen die neuen Zeilen in
+`lib/orgaPlan.ts` und der Import läuft nochmal.
 
 Admin-Passwort-Hash für `ADMIN_PASSWORD_HASH` erzeugen:
 

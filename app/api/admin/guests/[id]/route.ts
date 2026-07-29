@@ -6,7 +6,6 @@ import { logger } from "@/lib/logger";
 const updateSchema = z.object({
   name: z.string().trim().min(1, "Name ist erforderlich").max(200),
   email: z.string().trim().email("Ungültige E-Mail-Adresse"),
-  phone: z.string().trim().max(50).optional().or(z.literal("")),
   plusOnes: z.coerce.number().int().min(0).max(20),
 });
 
@@ -26,10 +25,10 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     return NextResponse.json({ error: "Gast nicht gefunden" }, { status: 404 });
   }
 
-  const { name, email, phone, plusOnes } = parsed.data;
+  const { name, email, plusOnes } = parsed.data;
   await prisma.guest.update({
     where: { id },
-    data: { name, email, phone: phone || null, plusOnes },
+    data: { name, email, plusOnes },
   });
 
   logger.info("admin.guest_updated", { guestId: id });

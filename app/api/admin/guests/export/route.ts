@@ -11,11 +11,10 @@ export async function GET() {
   const guests = await prisma.guest.findMany({ orderBy: { name: "asc" } });
 
   const rows = [
-    ["Name", "E-Mail", "Telefon", "Begleitpersonen", "Status", "Warteliste", "Angemeldet am"],
+    ["Name", "E-Mail", "Begleitpersonen", "Status", "Warteliste", "Angemeldet am"],
     ...guests.map((guest) => [
       guest.name,
       guest.email,
-      guest.phone ?? "",
       String(guest.plusOnes),
       statusLabels[guest.paymentStatus] ?? guest.paymentStatus,
       guest.waitlisted ? "ja" : "nein",
