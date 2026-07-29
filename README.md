@@ -94,6 +94,9 @@ werden also beim Deploy automatisch angewendet. Nach dem ersten Deploy einmalig
 Den Seed gegen die Datenbank einer Vercel-Umgebung laufen lassen:
 
 ```bash
-npx vercel env pull .env   # holt DATABASE_URL der verknüpften Umgebung
+npx vercel env pull .env --environment=production   # holt DATABASE_URL
 npm run db:seed
 ```
+
+Ohne `--environment` zieht die CLI die Development-Variablen; für Preview
+entsprechend `--environment=preview`.
