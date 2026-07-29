@@ -150,7 +150,7 @@ export function RsvpForm({ paypalClientId }: Props) {
       <button
         type="submit"
         disabled={submitting}
-        className="w-full rounded-md bg-white px-4 py-2 font-semibold text-black disabled:opacity-50"
+        className="w-full rounded-md bg-white px-4 py-3 font-semibold text-black disabled:opacity-50"
       >
         {submitting ? "Wird gesendet…" : "Anmelden"}
       </button>
