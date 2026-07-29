@@ -18,7 +18,12 @@ export function LocationMap() {
         />
       </div>
       <p className="mt-2 text-center text-xs text-white/60 [text-shadow:0_1px_6px_rgba(0,0,0,0.9)]">
-        <a href={VENUE.googleMapsUrl} target="_blank" rel="noopener noreferrer" className="underline">
+        <a
+          href={VENUE.googleMapsUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-block py-2 underline"
+        >
           In Google Maps öffnen
         </a>
       </p>
