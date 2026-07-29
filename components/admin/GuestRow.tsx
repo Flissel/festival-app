@@ -8,7 +8,6 @@ type Guest = {
   id: string;
   name: string;
   email: string;
-  phone: string | null;
   plusOnes: number;
   paymentStatus: "pending" | "cash_pending" | "paid";
   waitlisted: boolean;
@@ -43,7 +42,6 @@ export function GuestRow({ guest }: { guest: Guest }) {
         body: JSON.stringify({
           name: formData.get("name"),
           email: formData.get("email"),
-          phone: formData.get("phone"),
           plusOnes: formData.get("plusOnes"),
         }),
       });
@@ -92,7 +90,7 @@ export function GuestRow({ guest }: { guest: Guest }) {
   if (editing) {
     return (
       <tr className="border-t border-white/10">
-        <td colSpan={6} className="px-4 py-3">
+        <td colSpan={5} className="px-4 py-3">
           <form onSubmit={handleSave} className="flex flex-wrap items-end gap-3">
             <label className="flex-1 min-w-40 text-xs text-white/60">
               Name
@@ -101,10 +99,6 @@ export function GuestRow({ guest }: { guest: Guest }) {
             <label className="flex-1 min-w-48 text-xs text-white/60">
               E-Mail
               <input name="email" type="email" defaultValue={guest.email} required className={inputClass} />
-            </label>
-            <label className="min-w-32 text-xs text-white/60">
-              Telefon
-              <input name="phone" defaultValue={guest.phone ?? ""} className={inputClass} />
             </label>
             <label className="w-24 text-xs text-white/60">
               Begleitung
@@ -137,7 +131,6 @@ export function GuestRow({ guest }: { guest: Guest }) {
     <tr className="border-t border-white/10">
       <td className="px-4 py-2">{guest.name}</td>
       <td className="px-4 py-2">{guest.email}</td>
-      <td className="px-4 py-2">{guest.phone ?? "—"}</td>
       <td className="px-4 py-2">{guest.plusOnes}</td>
       <td className="px-4 py-2">
         {guest.waitlisted ? (

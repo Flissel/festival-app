@@ -7,7 +7,6 @@ type GuestRecord = {
   id: string;
   name: string;
   email: string;
-  phone: string | null;
   plusOnes: number;
   paymentStatus: "pending" | "cash_pending" | "paid";
   waitlisted: boolean;
@@ -21,7 +20,6 @@ function GuestTable({ guests, emptyText }: { guests: GuestRecord[]; emptyText: s
           <tr>
             <th className="px-4 py-2">Name</th>
             <th className="px-4 py-2">E-Mail</th>
-            <th className="px-4 py-2">Telefon</th>
             <th className="px-4 py-2">+Begleitung</th>
             <th className="px-4 py-2">Status</th>
             <th className="px-4 py-2"></th>
@@ -33,7 +31,7 @@ function GuestTable({ guests, emptyText }: { guests: GuestRecord[]; emptyText: s
           ))}
           {guests.length === 0 && (
             <tr>
-              <td colSpan={6} className="px-4 py-6 text-center text-white/40">
+              <td colSpan={5} className="px-4 py-6 text-center text-white/40">
                 {emptyText}
               </td>
             </tr>
@@ -51,7 +49,6 @@ export default async function AdminGuestsPage() {
     id: guest.id,
     name: guest.name,
     email: guest.email,
-    phone: guest.phone,
     plusOnes: guest.plusOnes,
     paymentStatus: guest.paymentStatus,
     waitlisted: guest.waitlisted,

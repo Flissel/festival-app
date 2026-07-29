@@ -4,6 +4,7 @@ import { NewTaskForm } from "@/components/admin/NewTaskForm";
 import { NewCategoryForm } from "@/components/admin/NewCategoryForm";
 import { CategoryHeader } from "@/components/admin/CategoryHeader";
 import { TaskFilters } from "@/components/admin/TaskFilters";
+import { ImportPlanButton } from "@/components/admin/ImportPlanButton";
 import { formatDueDate } from "@/lib/dueDate";
 
 export const dynamic = "force-dynamic";
@@ -49,11 +50,23 @@ export default async function AdminTasksPage({
     <div className="space-y-8">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold">Aufgaben</h1>
-        <div className="flex items-center gap-4">
+        <div className="flex flex-wrap items-center gap-4">
           <TaskFilters />
+          <ImportPlanButton />
           <NewCategoryForm />
         </div>
       </div>
+
+      {/* Beim ersten Aufruf ist die Seite leer — dann ist der Import der
+          naheliegende erste Schritt und wird entsprechend erklärt. */}
+      {categories.length === 0 && (
+        <div className="rounded-xl border border-white/10 bg-white/5 p-6 text-sm text-white/70">
+          Noch keine Kategorien angelegt. &bdquo;Orga-Plan einspielen&ldquo; legt den
+          abgestimmten Plan an — Getränke, Essen, Musik, die vier Areas, Steg und
+          die Ideensammlung. Der Import ist wiederholbar: Er ergänzt später nur,
+          was neu dazugekommen ist.
+        </div>
+      )}
 
       {categories.map((category) => (
         <section key={category.id} className="space-y-3">

@@ -32,13 +32,14 @@ enum RequestStatus {
   answered
 }
 
+// Nur die drei Felder, die das Anmeldeformular erhebt. Telefon und Allergien
+// wurden entfernt, als das Formular verschlankt wurde — sie ließen sich nicht
+// mehr befüllen und hatten keinen Verwendungszweck.
 model Guest {
   id            String        @id @default(cuid())
   name          String
   email         String
-  phone         String?
   plusOnes      Int           @default(0)
-  allergies     String?
   paymentStatus PaymentStatus @default(pending)
   waitlisted    Boolean       @default(false)
   createdAt     DateTime      @default(now())

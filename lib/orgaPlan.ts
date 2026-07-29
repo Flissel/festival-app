@@ -10,6 +10,9 @@
 //   Text im Titel und nicht als Member-Zuweisung: Member brauchen eine
 //   Telefonnummer, und die liegt für die meisten noch nicht vor.
 
+import type { PrismaClient } from "@/app/generated/prisma/client";
+import { parseDueDate } from "@/lib/dueDate";
+
 export const EVENT_DAY = "2026-08-29";
 
 export type PlanTask = {
@@ -85,3 +88,54 @@ export const ORGA_PLAN: PlanCategory[] = [
     ),
   },
 ];
+
+export type ImportResult = {
+  createdCategories: number;
+  createdTasks: number;
+};
+
+// Schreibt den Plan in die Datenbank. Idempotent: Kategorien und Aufgaben
+// werden über ihren Namen wiedererkannt, ein zweiter Lauf ergänzt nur, was neu
+// ist, und fasst Status, Zuweisung und Kosten bestehender Einträge nicht an.
+//
+// Wird von zwei Seiten benutzt — vom Seed-Script und vom Button im Admin —,
+// damit es nur eine Wahrheit gibt, wie der Plan in die Datenbank kommt.
+export async function importOrgaPlan(db: PrismaClient): Promise<ImportResult> {
+  const highest = await db.budgetCategory.aggregate({ _max: { sortOrder: true } });
+  let nextSortOrder = (highest._max.sortOrder ?? -1) + 1;
+
+  let createdCategories = 0;
+  let createdTasks = 0;
+
+  for (const planCategory of ORGA_PLAN) {
+    let category = await db.budgetCategory.findFirst({
+      where: { name: planCategory.name },
+    });
+
+    if (!category) {
+      category = await db.budgetCategory.create({
+        data: { name: planCategory.name, sortOrder: nextSortOrder },
+      });
+      nextSortOrder += 1;
+      createdCategories += 1;
+    }
+
+    for (const task of planCategory.tasks) {
+      const existing = await db.task.findFirst({
+        where: { categoryId: category.id, title: task.title },
+      });
+      if (existing) continue;
+
+      await db.task.create({
+        data: {
+          categoryId: category.id,
+          title: task.title,
+          dueDate: parseDueDate(task.dueDate),
+        },
+      });
+      createdTasks += 1;
+    }
+  }
+
+  return { createdCategories, createdTasks };
+}
