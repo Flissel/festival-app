@@ -4,6 +4,10 @@ import { logger } from "@/lib/logger";
 import { rsvpSchema } from "@/lib/validation/rsvp";
 import { sendRsvpConfirmation, sendWaitlistConfirmation } from "@/lib/email";
 import { checkRateLimit, clientIp, isHoneypotFilled } from "@/lib/rateLimit";
+import { isUniqueViolation } from "@/lib/prismaError";
+
+const DUPLICATE_MESSAGE =
+  "Mit dieser E-Mail-Adresse gibt es bereits eine Anmeldung. Für Änderungen schreib uns über das Kontaktformular.";
 
 function readCapacity(): number | null {
   const raw = process.env.RSVP_CAPACITY;
@@ -44,13 +48,7 @@ export async function POST(request: NextRequest) {
     where: { email: { equals: email, mode: "insensitive" } },
   });
   if (existing) {
-    return NextResponse.json(
-      {
-        error:
-          "Mit dieser E-Mail-Adresse gibt es bereits eine Anmeldung. Für Änderungen schreib uns über das Kontaktformular.",
-      },
-      { status: 409 }
-    );
+    return NextResponse.json({ error: DUPLICATE_MESSAGE }, { status: 409 });
   }
 
   let waitlisted = false;
@@ -64,9 +62,19 @@ export async function POST(request: NextRequest) {
     waitlisted = current + 1 + plusOnes > capacity;
   }
 
-  const guest = await prisma.guest.create({
-    data: { name, email, plusOnes, waitlisted },
-  });
+  let guest;
+  try {
+    guest = await prisma.guest.create({
+      data: { name, email, plusOnes, waitlisted },
+    });
+  } catch (error) {
+    // Zwei Anmeldungen derselben Adresse im selben Moment kommen beide an der
+    // Prüfung oben vorbei — abgefangen wird das erst hier von der Datenbank.
+    if (isUniqueViolation(error)) {
+      return NextResponse.json({ error: DUPLICATE_MESSAGE }, { status: 409 });
+    }
+    throw error;
+  }
 
   logger.info("rsvp.created", { guestId: guest.id, waitlisted });
 

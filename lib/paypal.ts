@@ -2,6 +2,74 @@ import { logger } from "@/lib/logger";
 
 const PAYPAL_API_BASE = process.env.PAYPAL_API_BASE ?? "https://api-m.sandbox.paypal.com";
 
+// Ohne gesetztes PAYPAL_API_BASE läuft alles gegen die Sandbox — Zahlungen
+// sehen dann vollständig echt aus, es bewegt sich aber kein Geld. Das ist der
+// Fehler, den man am längsten nicht bemerkt, deshalb ist er hier abfragbar.
+export function isLiveEnvironment(): boolean {
+  return !PAYPAL_API_BASE.includes("sandbox");
+}
+
+export function paypalApiBase(): string {
+  return PAYPAL_API_BASE;
+}
+
+export type PaypalHealth = {
+  apiBase: string;
+  live: boolean;
+  credentialsConfigured: boolean;
+  authOk: boolean;
+  authError: string | null;
+  webhookConfigured: boolean;
+  clientIdConfigured: boolean;
+};
+
+// Prüft, ob die hinterlegten Zugangsdaten zu dieser Umgebung gehören: Ein
+// Sandbox-Schlüsselpaar gegen die Live-API (oder umgekehrt) scheitert genau
+// hier mit 401 — und sonst erst beim ersten Zahlungsversuch eines Gastes.
+export async function checkPaypalHealth(): Promise<PaypalHealth> {
+  const clientId = process.env.PAYPAL_CLIENT_ID;
+  const secret = process.env.PAYPAL_SECRET;
+  const health: PaypalHealth = {
+    apiBase: PAYPAL_API_BASE,
+    live: isLiveEnvironment(),
+    credentialsConfigured: Boolean(clientId && secret),
+    authOk: false,
+    authError: null,
+    webhookConfigured: Boolean(process.env.PAYPAL_WEBHOOK_ID),
+    clientIdConfigured: Boolean(clientId),
+  };
+
+  if (!health.credentialsConfigured) {
+    health.authError = "PAYPAL_CLIENT_ID oder PAYPAL_SECRET fehlt";
+    return health;
+  }
+
+  try {
+    // Bewusst am Token-Cache vorbei: Die Seite soll den echten aktuellen Stand
+    // zeigen, nicht ein Ergebnis von vor einer Stunde.
+    const response = await fetch(`${PAYPAL_API_BASE}/v1/oauth2/token`, {
+      method: "POST",
+      headers: {
+        Authorization: `Basic ${Buffer.from(`${clientId}:${secret}`).toString("base64")}`,
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: "grant_type=client_credentials",
+      cache: "no-store",
+    });
+
+    if (response.ok) {
+      health.authOk = true;
+    } else {
+      const body = await response.text();
+      health.authError = `HTTP ${response.status} — ${body.slice(0, 200)}`;
+    }
+  } catch (error) {
+    health.authError = error instanceof Error ? error.message : String(error);
+  }
+
+  return health;
+}
+
 let cachedToken: { accessToken: string; expiresAt: number } | null = null;
 
 async function getAccessToken(): Promise<string> {

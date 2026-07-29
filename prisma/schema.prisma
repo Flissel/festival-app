@@ -32,13 +32,24 @@ enum RequestStatus {
   answered
 }
 
+// Woher eine Änderung kam. Im Admin sitzt eine angemeldete Person, über den
+// Chat schreibt OpenClaw im Auftrag einer Person aus der Telegram-Gruppe.
+enum AuditSource {
+  admin
+  chat
+  system
+}
+
 // Nur die drei Felder, die das Anmeldeformular erhebt. Telefon und Allergien
 // wurden entfernt, als das Formular verschlankt wurde — sie ließen sich nicht
 // mehr befüllen und hatten keinen Verwendungszweck.
 model Guest {
   id            String        @id @default(cuid())
   name          String
-  email         String
+  // Eindeutig, damit die Doppelanmeldungs-Prüfung nicht nur im Code steht:
+  // zwei gleichzeitige Anmeldungen mit derselben Adresse würden die reine
+  // Lesen-dann-Schreiben-Prüfung sonst beide passieren.
+  email         String        @unique
   plusOnes      Int           @default(0)
   paymentStatus PaymentStatus @default(pending)
   waitlisted    Boolean       @default(false)
@@ -53,6 +64,9 @@ model Payment {
   amount        Decimal              @db.Decimal(10, 2)
   currency      String               @default("EUR")
   paypalOrderId String?              @unique
+  // ID der tatsächlichen Buchung bei PayPal. Ohne die lässt sich ein Eintrag
+  // hier nicht mit einer Zeile im PayPal-Konto abgleichen.
+  paypalCaptureId String?
   status        PaymentRecordStatus  @default(pending)
   createdAt     DateTime             @default(now())
   completedAt   DateTime?
@@ -60,7 +74,10 @@ model Payment {
 
 model BudgetCategory {
   id        String   @id @default(cuid())
-  name      String
+  // Eindeutig: Der Plan-Import und die Chat-Werkzeuge erkennen Kategorien am
+  // Namen. Ohne Constraint legen zwei gleichzeitige Zugriffe zwei Kategorien
+  // gleichen Namens an, und danach ist nicht mehr klar, welche gemeint ist.
+  name      String   @unique
   sortOrder Int      @default(0)
   tasks     Task[]
 }
@@ -98,6 +115,30 @@ model Task {
   dueDate        DateTime?
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
+
+  // Gleicher Grund wie bei der Kategorie: Import und Chat erkennen Aufgaben am
+  // Titel innerhalb ihrer Kategorie.
+  @@unique([categoryId, title])
+}
+
+// Wer hat was wann geändert. Bei fünf Leuten, die parallel im Admin und über
+// die Telegram-Gruppe pflegen, ist das der einzige Weg herauszufinden, warum
+// ein Eintrag plötzlich anders aussieht.
+//
+// Bei source = chat ist `actor` das, was OpenClaw als Urheber meldet — ein
+// Protokoll, keine Zugangskontrolle. Die Zugangskontrolle ist der MCP-Token.
+model AuditEntry {
+  id        String      @id @default(cuid())
+  at        DateTime    @default(now())
+  source    AuditSource
+  actor     String
+  action    String
+  entity    String
+  entityId  String?
+  summary   String
+  createdAt DateTime    @default(now())
+
+  @@index([at])
 }
 
 model Request {
