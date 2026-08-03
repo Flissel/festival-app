@@ -1,11 +1,13 @@
 import { ImageResponse } from "next/og";
-import { EVENT, formatEventDate } from "@/lib/event";
+import { formatEventDate, getEvent } from "@/lib/event";
 
-export const alt = `${EVENT.name} — Du bist eingeladen`;
+export const alt = "Du bist eingeladen";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-export default function OpengraphImage() {
+export default async function OpengraphImage() {
+  const event = await getEvent();
+
   return new ImageResponse(
     (
       <div
@@ -30,9 +32,9 @@ export default function OpengraphImage() {
         >
           Du bist eingeladen
         </div>
-        <div style={{ marginTop: 24, fontSize: 96, fontWeight: 700 }}>{EVENT.name}</div>
+        <div style={{ marginTop: 24, fontSize: 96, fontWeight: 700 }}>{event.name}</div>
         <div style={{ marginTop: 24, fontSize: 36, color: "rgba(255,255,255,0.85)" }}>
-          {formatEventDate()}
+          {formatEventDate(event.startsAt)}
         </div>
         <div style={{ marginTop: 16, fontSize: 28, color: "rgba(255,255,255,0.6)" }}>
           Bar &amp; Cocktails · Sound · Live-Acts

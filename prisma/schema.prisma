@@ -152,3 +152,19 @@ model Request {
   createdAt  DateTime      @default(now())
   answeredAt DateTime?
 }
+
+// Termin, Name und Line-up-Hinweis der Veranstaltung. Genau eine Zeile mit
+// fester Kennung: Es gibt ein Fest, nicht viele. Fehlt die Zeile, greifen die
+// Vorgaben aus lib/event.ts — die Einladung steht also auch vor dem ersten
+// Speichern im Admin.
+//
+// Beginn und Ende liegen bewusst als echte Zeitpunkte vor und nicht als Text:
+// Aus einem Satz wie "ab 13 Uhr" lässt sich kein Kalendereintrag bauen.
+model EventInfo {
+  id         String    @id
+  name       String
+  startsAt   DateTime?
+  endsAt     DateTime?
+  lineupNote String?
+  updatedAt  DateTime  @updatedAt
+}

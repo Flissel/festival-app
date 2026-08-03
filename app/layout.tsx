@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { EVENT } from "@/lib/event";
+import { getEvent } from "@/lib/event";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -13,16 +13,21 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: `${EVENT.name} — Einladung`,
-  description: "Einladung, Anmeldung und Beitrag für unser Festival",
-  openGraph: {
-    title: `${EVENT.name} — Du bist eingeladen`,
-    description: "Trag dich ein und sichere dir deinen Platz. Beitrag auf Spendenbasis.",
-    type: "website",
-    locale: "de_DE",
-  },
-};
+// Der Name kommt aus dem Admin, also muss auch der Seitentitel pro Aufruf
+// entstehen — sonst hieße der Tab weiter wie beim letzten Deploy.
+export async function generateMetadata(): Promise<Metadata> {
+  const { name } = await getEvent();
+  return {
+    title: `${name} — Einladung`,
+    description: "Einladung, Anmeldung und Beitrag für unser Festival",
+    openGraph: {
+      title: `${name} — Du bist eingeladen`,
+      description: "Trag dich ein und sichere dir deinen Platz. Beitrag auf Spendenbasis.",
+      type: "website",
+      locale: "de_DE",
+    },
+  };
+}
 
 export default function RootLayout({
   children,

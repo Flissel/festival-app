@@ -3,7 +3,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { normalizePhone } from "@/lib/phone";
 import { VENUE } from "@/lib/venue";
-import { EVENT, formatEventDate } from "@/lib/event";
+import { formatEventDate, getEvent } from "@/lib/event";
 import { parseDueDate } from "@/lib/dueDate";
 import { recordAudit } from "@/lib/audit";
 import { isUniqueViolation, isRecordNotFound } from "@/lib/prismaError";
@@ -91,19 +91,21 @@ export function createMcpServer() {
       description: "Name, Termin, Line-up-Hinweis, Location und Kartenlink.",
       inputSchema: {},
     },
-    async () =>
-      text(
+    async () => {
+      const event = await getEvent();
+      return text(
         [
-          `Festival: ${EVENT.name}`,
-          `Termin: ${formatEventDate()}`,
-          EVENT.lineupNote ? `Line-up: ${EVENT.lineupNote}` : null,
+          `Festival: ${event.name}`,
+          `Termin: ${formatEventDate(event.startsAt)}`,
+          event.lineupNote ? `Line-up: ${event.lineupNote}` : null,
           `Location: ${VENUE.label}`,
           `Koordinaten: ${VENUE.latitude}, ${VENUE.longitude}`,
           `Karte: ${VENUE.googleMapsUrl}`,
         ]
           .filter(Boolean)
           .join("\n")
-      )
+      );
+    }
   );
 
   server.registerTool(
