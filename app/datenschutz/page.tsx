@@ -6,7 +6,6 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 
-// Offen: Kontakt-E-Mail und der Name des Datenbank-Anbieters.
 export default function DatenschutzPage() {
   return (
     <main className="flex min-h-screen flex-1 flex-col bg-gradient-to-b from-neutral-950 via-neutral-900 to-neutral-950 text-white">
@@ -63,7 +62,7 @@ export default function DatenschutzPage() {
             <h2 className="text-lg font-semibold text-white">Weitergabe und Hosting</h2>
             <p className="mt-2">
               Deine Daten werden nicht an Dritte weitergegeben. Die Anwendung wird bei
-              Vercel Inc. gehostet; die Datenbank liegt bei [Datenbank-Anbieter].
+              Vercel Inc. gehostet; die Datenbank liegt bei Neon Inc.
               Bestätigungs-E-Mails versenden wir über Google (Gmail).
             </p>
           </div>
