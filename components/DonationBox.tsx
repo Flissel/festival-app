@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { PaypalDonation } from "@/components/PaypalDonation";
+import { formatIban, paypalMeLink } from "@/lib/donation";
 
 const PRESETS = [10, 20, 50];
 
@@ -13,19 +13,20 @@ const USES = [
 ];
 
 type Props = {
-  paypalClientId: string;
-  guestId: string;
-  defaultAmount?: number | null;
+  paypalMeHandle: string | null;
+  iban: string | null;
+  ibanHolder: string | null;
 };
 
-export function DonationBox({ paypalClientId, guestId, defaultAmount = null }: Props) {
-  const [amountInput, setAmountInput] = useState(
-    defaultAmount !== null ? defaultAmount.toFixed(2) : ""
-  );
-  const [open, setOpen] = useState(defaultAmount !== null);
+export function DonationBox({ paypalMeHandle, iban, ibanHolder }: Props) {
+  const [amountInput, setAmountInput] = useState("");
+  const [open, setOpen] = useState(false);
 
   const parsed = Number.parseFloat(amountInput.replace(",", "."));
   const amount = Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+
+  // Ohne Zahlweg wäre der Kasten eine Einladung ins Leere.
+  if (!paypalMeHandle && !iban) return null;
 
   if (!open) {
     return (
@@ -38,7 +39,7 @@ export function DonationBox({ paypalClientId, guestId, defaultAmount = null }: P
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="mt-3 rounded-md border border-white/25 px-4 py-2 text-sm font-medium hover:bg-white/10"
+          className="mt-3 min-h-12 rounded-md border border-white/25 px-4 py-2 text-sm font-medium hover:bg-white/10"
         >
           Veranstalter unterstützen
         </button>
@@ -72,7 +73,7 @@ export function DonationBox({ paypalClientId, guestId, defaultAmount = null }: P
             key={preset}
             type="button"
             onClick={() => setAmountInput(preset.toFixed(2))}
-            className={`rounded-md border px-3 py-1 text-sm ${
+            className={`min-h-12 rounded-md border px-4 py-2 text-sm ${
               amount === preset
                 ? "border-white bg-white text-black"
                 : "border-white/25 hover:bg-white/10"
@@ -86,27 +87,47 @@ export function DonationBox({ paypalClientId, guestId, defaultAmount = null }: P
       <label htmlFor="donation-amount" className="mt-4 block text-xs text-white/60">
         Eigener Betrag (€)
       </label>
+      {/* Bewusst kein type="number": Das Feld verwirft ein Komma, und hier
+          tippt jeder „12,50". Geparst wird beides. */}
       <input
         id="donation-amount"
-        type="number"
-        min={1}
-        step="0.01"
+        type="text"
+        inputMode="decimal"
+        autoComplete="off"
+        placeholder="z. B. 15"
         value={amountInput}
         onChange={(event) => setAmountInput(event.target.value)}
-        className="mt-1 w-full rounded-md border border-white/20 bg-black/20 px-3 py-2"
+        className="mt-1 w-full rounded-md border border-white/20 bg-black/20 px-3 py-2 text-base"
       />
 
-      {amount !== null ? (
-        <PaypalDonation
-          key={amount}
-          clientId={paypalClientId}
-          guestId={guestId}
-          amount={amount}
-        />
-      ) : (
-        <p className="mt-3 text-sm text-white/50">
-          Wähle einen Betrag, um die PayPal-Zahlung zu starten.
-        </p>
+      {paypalMeHandle && (
+        <div className="mt-4">
+          <a
+            href={paypalMeLink(paypalMeHandle, amount)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex min-h-12 w-full items-center justify-center rounded-md bg-white px-4 py-3 text-sm font-semibold text-black hover:bg-white/90"
+          >
+            {amount !== null
+              ? `${amount.toFixed(2).replace(".", ",")} € über PayPal senden`
+              : "Mit PayPal unterstützen"}
+          </a>
+          {/* Der wichtigste Satz im ganzen Kasten: bei „Waren und
+              Dienstleistungen" zieht PayPal Gebühren ab, bei „Freunde und
+              Familie" nicht. */}
+          <p className="mt-2 text-xs text-white/50">
+            Bitte im PayPal-Fenster <strong className="text-white/70">&bdquo;An einen Freund&ldquo;</strong>{" "}
+            wählen — dann kommt der volle Betrag an.
+          </p>
+        </div>
+      )}
+
+      {iban && (
+        <div className="mt-4 rounded-lg border border-white/10 bg-black/20 p-4 text-sm">
+          <p className="text-white/70">Lieber überweisen?</p>
+          <p className="mt-1 font-mono text-xs break-all text-white/80">{formatIban(iban)}</p>
+          {ibanHolder && <p className="mt-1 text-xs text-white/50">{ibanHolder}</p>}
+        </div>
       )}
     </div>
   );

@@ -1,16 +1,16 @@
 # Festival-App
 
 Einladungs- und Orga-App für unser Festival: Gäste melden sich über die öffentliche
-Einladungsseite an und zahlen ihren Beitrag auf Spendenbasis (PayPal oder bar), die
+Einladungsseite an und geben freiwillig etwas dazu (PayPal oder bar), die
 Orga verwaltet Gäste, Aufgaben, Budget und Teams im passwortgeschützten Admin-Bereich.
 
 ## Features
 
 - **Einladungsseite** mit Termin, Anfahrtskarte, datensparsamem Anmeldeformular
   (Name, E-Mail, Begleitpersonen) und Datenschutzhinweis
-- **Beitrag auf Spendenbasis**: PayPal-Checkout mit Webhook-Abgleich oder Barzahlung
-  vor Ort, Bestätigungsmail per Gmail; abgebrochene Zahlungen lassen sich über den
-  Link in der Mail (`/zahlung/<id>`) jederzeit nachholen
+- **Freiwilliger Beitrag**: PayPal.me-Link mit vorbelegtem Betrag oder Bankverbindung,
+  Bestätigungsmail per Gmail; wer erst später etwas geben will, kommt über den Link
+  in der Mail (`/zahlung/<id>`) zurück
 - **Warteliste**: Bei erreichter Kapazität (`RSVP_CAPACITY`) landen neue Anmeldungen
   automatisch auf der Warteliste; Nachrücken per Klick im Admin inkl. Info-Mail
 - **Kontaktformular** mit Anfragen-Inbox im Admin, E-Mail-Benachrichtigung an die Orga
@@ -19,9 +19,8 @@ Orga verwaltet Gäste, Aufgaben, Budget und Teams im passwortgeschützten Admin-
   CSV-Export für die Türliste), Aufgaben-Board mit Budgetkategorien
   (Plan-/Ist-Kosten, Fälligkeitsdaten, Status-Filter), Teams & Members,
   Broadcast über das OpenClaw-Gateway
-- **PayPal-Status** unter `/admin/paypal`: zeigt live, ob die Anbindung gegen die
-  Sandbox oder gegen echtes Geld läuft, ob die Zugangsdaten passen und welche
-  Buchungen angekommen sind
+- **Spenden** unter `/admin/spenden`: zeigt, wohin die Einladungsseite verweist, ob
+  die Angaben stimmen und was bisher eingetragen wurde
 - **Verlauf** unter `/admin/verlauf`: wer hat was geändert — aus dem Admin und aus
   der Orga-Gruppe
 - **MCP-Server** unter `/api/mcp` (Bearer-Token) als Datenzugang für OpenClaw
@@ -30,7 +29,7 @@ Orga verwaltet Gäste, Aufgaben, Budget und Teams im passwortgeschützten Admin-
 ## Stack
 
 Next.js (App Router) · React · Tailwind CSS · Prisma + PostgreSQL · Zod ·
-Nodemailer (Gmail) · PayPal REST API
+Nodemailer (Gmail)
 
 ## Setup
 
@@ -72,7 +71,12 @@ Optional:
 
 - `RSVP_CAPACITY` — maximale Gesamt-Gästezahl (inkl. Begleitpersonen); leer lassen
   für unbegrenzt. Bei Erreichen landen neue Anmeldungen auf der Warteliste.
-- `APP_BASE_URL` — öffentliche Basis-URL, wird für Zahlungslinks in E-Mails genutzt
+- `APP_BASE_URL` — öffentliche Basis-URL, wird für Links in E-Mails genutzt
+- `PAYPAL_ME_URL` — PayPal.me-Kürzel oder ganze URL; ohne den Wert zeigt die
+  Einladungsseite keinen PayPal-Link. Anlegen unter
+  <https://www.paypal.com/paypalme/grab>
+- `DONATION_IBAN`/`DONATION_IBAN_HOLDER` — Bankverbindung für alle, die lieber
+  überweisen
 - `OPENCLAW_GATEWAY_URL`/`OPENCLAW_GATEWAY_TOKEN` — ohne diese Werte geht keine
   Nachricht raus; der Broadcast weist im Admin darauf hin
 - `OPENCLAW_CHANNEL` — Kanalname für das Gateway, Standard `telegram`
@@ -131,21 +135,19 @@ npm run typecheck  # TypeScript
 npm test           # Vitest (Auth, Validierung, Rate-Limiter, CSV, Orga-Plan)
 ```
 
-### PayPal überprüfen
+### Spenden
 
-`/admin/paypal` prüft bei jedem Aufruf live, ob die Anbindung steht: Umgebung
-(Sandbox oder echt), ob die Zugangsdaten zu dieser Umgebung passen, ob der
-Webhook konfiguriert ist, und welche Buchungen angekommen sind.
+Die App wickelt **keine** Zahlung ab. Auf der Einladungsseite steht ein
+PayPal.me-Link mit vorbelegtem Betrag; das Geld geht direkt von Gast zu
+Veranstalter. Der Grund: Die PayPal-REST-API setzt ein Geschäftskonto voraus,
+und das kostet pro Zahlung Gebühren (2,49 % + 0,35 €). Über den Link kann der
+Gast „An einen Freund" wählen — innerhalb der EU in Euro gebührenfrei. Der
+Kasten weist ihn darauf hin.
 
-Der häufigste stille Fehler ist die Sandbox: Ohne gesetztes `PAYPAL_API_BASE`
-läuft alles gegen `api-m.sandbox.paypal.com`. Der Bezahlvorgang sieht dann
-vollständig echt aus, es fließt aber kein Geld.
-
-Die App setzt in der Bestellung keinen abweichenden Empfänger, PayPal bucht
-deshalb auf das Konto, dem die hinterlegte `PAYPAL_CLIENT_ID` gehört.
-Endgültig bestätigen lässt sich das nur mit einer echten Zahlung: anmelden,
-1 € spenden, danach die Buchungs-ID aus `/admin/paypal` in den eigenen
-PayPal-Umsätzen wiederfinden.
+Die Kehrseite: Es gibt keinen Rückkanal. Die App erfährt nicht, ob jemand
+gezahlt hat. Eingänge trägt die Orga im Admin unter *Gäste* von Hand ein,
+genau wie Bargeld. `/admin/spenden` zeigt den hinterlegten Link zum Anklicken
+und meldet, wenn `PAYPAL_ME_URL` fehlt oder unbrauchbar ist.
 
 Die GitHub-Actions-CI (`.github/workflows/ci.yml`) führt alle drei Checks bei jedem
 Push und Pull Request aus.
@@ -155,8 +157,8 @@ Push und Pull Request aus.
 Das Projekt ist für Vercel mit einer Postgres-Datenbank (z. B. Neon) ausgelegt.
 `npm run build` führt `prisma generate` und `prisma migrate deploy` aus, Migrationen
 werden also beim Deploy automatisch angewendet. Nach dem ersten Deploy einmalig
-`npm run db:seed` gegen die Produktions-Datenbank ausführen und den PayPal-Webhook
-(`PAYMENT.CAPTURE.COMPLETED` → `/api/paypal/webhook`) in der PayPal-Konsole anlegen.
+`npm run db:seed` gegen die Produktions-Datenbank ausführen — oder stattdessen im
+Admin unter *Aufgaben* auf „Orga-Plan einspielen" klicken.
 
 Den Seed gegen die Datenbank einer Vercel-Umgebung laufen lassen:
 

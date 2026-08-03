@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { DonationBox } from "@/components/DonationBox";
+import type { DonationDisplay } from "@/lib/donation";
 
 type RsvpResult = {
   guestId: string;
@@ -9,10 +10,10 @@ type RsvpResult = {
 };
 
 type Props = {
-  paypalClientId: string;
+  donation: DonationDisplay;
 };
 
-export function RsvpForm({ paypalClientId }: Props) {
+export function RsvpForm({ donation }: Props) {
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [result, setResult] = useState<RsvpResult | null>(null);
@@ -79,7 +80,7 @@ export function RsvpForm({ paypalClientId }: Props) {
           </p>
         </div>
 
-        <DonationBox paypalClientId={paypalClientId} guestId={result.guestId} />
+        <DonationBox {...donation} />
       </div>
     );
   }

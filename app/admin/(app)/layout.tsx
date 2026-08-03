@@ -8,7 +8,7 @@ const NAV = [
   { href: "/admin/members", label: "Teams & Members" },
   { href: "/admin/anfragen", label: "Anfragen" },
   { href: "/admin/broadcast", label: "Broadcast" },
-  { href: "/admin/paypal", label: "PayPal" },
+  { href: "/admin/spenden", label: "Spenden" },
   { href: "/admin/verlauf", label: "Verlauf" },
 ];
 
