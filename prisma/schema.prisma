@@ -63,9 +63,11 @@ model Payment {
   guestId       String
   amount        Decimal              @db.Decimal(10, 2)
   currency      String               @default("EUR")
+  // Beide Felder stammen aus der Zeit mit der PayPal-REST-API und werden nicht
+  // mehr geschrieben: Spenden laufen jetzt über einen PayPal.me-Link, von dem
+  // die App nichts mitbekommt. Die Spalten bleiben, damit die Belege der
+  // damaligen Buchungen erhalten bleiben.
   paypalOrderId String?              @unique
-  // ID der tatsächlichen Buchung bei PayPal. Ohne die lässt sich ein Eintrag
-  // hier nicht mit einer Zeile im PayPal-Konto abgleichen.
   paypalCaptureId String?
   status        PaymentRecordStatus  @default(pending)
   createdAt     DateTime             @default(now())

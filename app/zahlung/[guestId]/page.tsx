@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { DonationBox } from "@/components/DonationBox";
 import { SiteFooter } from "@/components/SiteFooter";
+import { donationConfig } from "@/lib/donation";
 
 export const dynamic = "force-dynamic";
 
@@ -19,13 +20,11 @@ export default async function SupportPage({
   const { guestId } = await params;
   const guest = await prisma.guest.findUnique({
     where: { id: guestId },
-    include: { payments: { orderBy: { createdAt: "desc" } } },
+    select: { name: true, waitlisted: true },
   });
   if (!guest) notFound();
 
-  const paypalClientId = process.env.PAYPAL_CLIENT_ID ?? "";
-  const lastPendingAmount =
-    guest.payments.find((payment) => payment.status === "pending")?.amount ?? null;
+  const { paypalMeHandle, iban, ibanHolder } = donationConfig();
 
   return (
     <main className="flex min-h-screen flex-1 flex-col bg-gradient-to-b from-neutral-950 via-neutral-900 to-neutral-950 text-white">
@@ -47,9 +46,9 @@ export default async function SupportPage({
           </div>
         ) : (
           <DonationBox
-            paypalClientId={paypalClientId}
-            guestId={guest.id}
-            defaultAmount={lastPendingAmount !== null ? Number(lastPendingAmount) : null}
+            paypalMeHandle={paypalMeHandle}
+            iban={iban}
+            ibanHolder={ibanHolder}
           />
         )}
 

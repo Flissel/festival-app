@@ -3,9 +3,16 @@ import { LocationMap } from "@/components/LocationMap";
 import { SiteFooter } from "@/components/SiteFooter";
 import { KaleidoscopeField } from "@/components/KaleidoscopeField";
 import { EVENT, formatEventDate } from "@/lib/event";
+import { donationConfig } from "@/lib/donation";
+
+// Statisch würde der Spendenlink beim Build eingebacken. Wer ihn später in den
+// Umgebungsvariablen setzt, sähe ihn dann unter /admin/spenden schon, die Gäste
+// aber erst nach dem nächsten Deploy — und niemand merkt die Lücke. Lieber pro
+// Aufruf rendern; die Seite hat ohnehin kaum Last.
+export const dynamic = "force-dynamic";
 
 export default function HomePage() {
-  const paypalClientId = process.env.PAYPAL_CLIENT_ID ?? "";
+  const { paypalMeHandle, iban, ibanHolder } = donationConfig();
 
   return (
     <main className="relative flex min-h-screen flex-1 flex-col overflow-hidden bg-gradient-to-b from-neutral-950 via-neutral-900 to-neutral-950 text-white">
@@ -43,7 +50,7 @@ export default function HomePage() {
 
         {/* Leicht abgedunkelte Karte: hält das Formular über der Grafik lesbar. */}
         <div className="rounded-2xl border border-white/10 bg-neutral-950/70 p-6 backdrop-blur-sm">
-          <RsvpForm paypalClientId={paypalClientId} />
+          <RsvpForm donation={{ paypalMeHandle, iban, ibanHolder }} />
         </div>
 
         <p className="mt-10 text-center text-xs text-white/50 [text-shadow:0_1px_6px_rgba(0,0,0,0.9)]">
