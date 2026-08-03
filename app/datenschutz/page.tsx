@@ -6,8 +6,7 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 
-// PLATZHALTER: Vor Veröffentlichung die Angaben in eckigen Klammern ersetzen
-// und den Text auf euren tatsächlichen Einsatz prüfen.
+// Offen: Kontakt-E-Mail und der Name des Datenbank-Anbieters.
 export default function DatenschutzPage() {
   return (
     <main className="flex min-h-screen flex-1 flex-col bg-gradient-to-b from-neutral-950 via-neutral-900 to-neutral-950 text-white">
@@ -18,11 +17,11 @@ export default function DatenschutzPage() {
           <div>
             <h2 className="text-lg font-semibold text-white">Verantwortliche Stelle</h2>
             <p className="mt-2">
-              [Vor- und Nachname]
+              Felix Baumann
               <br />
-              [Straße Hausnummer]
+              Huglfingerstraße 5
               <br />
-              [PLZ Ort]
+              81477 München
               <br />
               E-Mail: [E-Mail-Adresse]
             </p>
@@ -41,9 +40,12 @@ export default function DatenschutzPage() {
                 <strong>Kontaktformular:</strong> Name, E-Mail-Adresse und deine Nachricht.
               </li>
               <li>
-                <strong>Freiwillige Unterstützung:</strong> Nur wenn du uns per PayPal
-                unterstützt, speichern wir Betrag und Zahlungsstatus. Die Zahlung selbst
-                wickelt PayPal ab; dort gelten zusätzlich deren Datenschutzhinweise.
+                <strong>Freiwillige Unterstützung:</strong> Wer uns etwas dalässt, tut
+                das direkt bei PayPal oder per Überweisung — wir übermitteln dafür keine
+                Daten und binden auf dieser Seite auch nichts von PayPal ein. Klickst du
+                den Spendenlink, verlässt du unsere Seite; ab dort gelten die
+                Datenschutzhinweise von PayPal. Was eingegangen ist, notieren wir intern
+                beim jeweiligen Namen (Betrag und Datum).
               </li>
             </ul>
           </div>
@@ -61,18 +63,16 @@ export default function DatenschutzPage() {
             <h2 className="text-lg font-semibold text-white">Weitergabe und Hosting</h2>
             <p className="mt-2">
               Deine Daten werden nicht an Dritte weitergegeben. Die Anwendung wird bei
-              [Hosting-Anbieter, z. B. Vercel Inc.] gehostet; die Datenbank liegt bei
-              [Datenbank-Anbieter]. Für die Zahlungsabwicklung ist PayPal eigenständig
-              verantwortlich. Bestätigungs-E-Mails versenden wir über [E-Mail-Anbieter, z. B.
-              Google/Gmail].
+              Vercel Inc. gehostet; die Datenbank liegt bei [Datenbank-Anbieter].
+              Bestätigungs-E-Mails versenden wir über Google (Gmail).
             </p>
           </div>
 
           <div>
             <h2 className="text-lg font-semibold text-white">Speicherdauer</h2>
             <p className="mt-2">
-              Wir löschen alle personenbezogenen Daten spätestens [Frist, z. B. 3 Monate] nach
-              der Veranstaltung, sofern keine gesetzlichen Aufbewahrungspflichten bestehen.
+              Wir löschen alle personenbezogenen Daten spätestens drei Monate nach der
+              Veranstaltung, sofern keine gesetzlichen Aufbewahrungspflichten bestehen.
             </p>
           </div>
 
