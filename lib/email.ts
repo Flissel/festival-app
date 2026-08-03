@@ -1,7 +1,8 @@
 import nodemailer from "nodemailer";
 import { logger } from "@/lib/logger";
 import { VENUE } from "@/lib/venue";
-import { formatEventDate } from "@/lib/event";
+import { formatEventDate, getEvent } from "@/lib/event";
+import { appBaseUrl } from "@/lib/appUrl";
 
 function getTransport() {
   const user = process.env.GMAIL_USER;
@@ -16,15 +17,12 @@ function getTransport() {
   });
 }
 
-export function appBaseUrl(): string | null {
-  const raw = process.env.APP_BASE_URL;
-  if (!raw) return null;
-  return raw.replace(/\/+$/, "");
-}
-
-const eventInfoBlock = () => `Wann: ${formatEventDate()}
+const eventInfoBlock = async () => {
+  const event = await getEvent();
+  return `Wann: ${formatEventDate(event.startsAt)}
 Location: ${VENUE.label}
 Karte: ${VENUE.googleMapsUrl}`;
+};
 
 export async function sendRsvpConfirmation(params: {
   to: string;
@@ -49,7 +47,7 @@ ${base}/zahlung/${params.guestId}\n`
 
 du bist dabei — wir haben dich eingetragen!
 ${supportBlock}
-${eventInfoBlock()}
+${await eventInfoBlock()}
 
 Fragen? Antworte einfach auf diese E-Mail oder nutze unser Kontaktformular.
 
@@ -86,7 +84,7 @@ danke für dein Interesse am Festival! Wir sind aktuell leider voll — du stehs
 
 Sobald ein Platz frei wird, melden wir uns sofort bei dir. Du musst nichts weiter tun.
 
-${eventInfoBlock()}
+${await eventInfoBlock()}
 
 Bis hoffentlich bald!`;
 
@@ -125,7 +123,7 @@ export async function sendWaitlistPromotion(params: {
 
 gute Nachrichten: Ein Platz ist frei geworden — du bist jetzt fest angemeldet! 🎉
 ${supportBlock}
-${eventInfoBlock()}
+${await eventInfoBlock()}
 
 Bis bald!`;
 

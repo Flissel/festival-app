@@ -6,8 +6,9 @@ Orga verwaltet Gäste, Aufgaben, Budget und Teams im passwortgeschützten Admin-
 
 ## Features
 
-- **Einladungsseite** mit Termin, Anfahrtskarte, datensparsamem Anmeldeformular
-  (Name, E-Mail, Begleitpersonen) und Datenschutzhinweis
+- **Einladungsseite** mit Termin, „Zum Kalender hinzufügen"-Button (`.ics`),
+  Anfahrtskarte, datensparsamem Anmeldeformular (Name, E-Mail, Begleitpersonen)
+  und Datenschutzhinweis
 - **Freiwilliger Beitrag**: PayPal.me-Link mit vorbelegtem Betrag oder Bankverbindung,
   Bestätigungsmail per Gmail; wer erst später etwas geben will, kommt über den Link
   in der Mail (`/zahlung/<id>`) zurück
@@ -21,6 +22,8 @@ Orga verwaltet Gäste, Aufgaben, Budget und Teams im passwortgeschützten Admin-
   Broadcast über das OpenClaw-Gateway
 - **Spenden** unter `/admin/spenden`: zeigt, wohin die Einladungsseite verweist, ob
   die Angaben stimmen und was bisher eingetragen wurde
+- **Event-Daten** unter `/admin/event`: Name, Beginn, Ende und Line-up ohne Deploy
+  ändern; schlägt auf Einladung, Kalenderdatei, Vorschaubild und Mails durch
 - **Verlauf** unter `/admin/verlauf`: wer hat was geändert — aus dem Admin und aus
   der Orga-Gruppe
 - **MCP-Server** unter `/api/mcp` (Bearer-Token) als Datenzugang für OpenClaw
@@ -83,8 +86,18 @@ Optional:
   Nachricht an die Gruppe statt einzeln an alle Members schicken
 - `MCP_SERVER_TOKEN` — ohne Token ist der MCP-Endpunkt deaktiviert
 
-Event-Daten (Name, Termin) stehen in [`lib/event.ts`](lib/event.ts), die Location in
-[`lib/venue.ts`](lib/venue.ts).
+## Termin und Line-up
+
+Name, Beginn, Ende und Line-up stehen in der Datenbank und werden im Admin unter
+*Event* gepflegt. Solange dort nichts gespeichert wurde, gelten die Vorgaben aus
+[`lib/event.ts`](lib/event.ts) — die Einladung steht also vom ersten Aufruf an.
+
+Beginn und Ende sind echte Zeitpunkte, keine Textzeile: Aus „ab 13 Uhr" lässt
+sich kein Kalendereintrag bauen. Eingegeben wird deutsche Ortszeit
+(`Europe/Berlin`), gespeichert wird in UTC, und `/kalender.ics` liefert daraus
+eine Kalenderdatei mit Termin, Ort und Koordinaten.
+
+Die Location steht weiterhin in [`lib/venue.ts`](lib/venue.ts).
 
 ## OpenClaw als Orga-Assistent
 
