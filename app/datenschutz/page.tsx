@@ -23,7 +23,7 @@ export default function DatenschutzPage() {
               <br />
               81477 München
               <br />
-              E-Mail: [E-Mail-Adresse]
+              E-Mail: felixbaumann404@gmail.com
             </p>
           </div>
 
@@ -81,7 +81,7 @@ export default function DatenschutzPage() {
             <p className="mt-2">
               Du hast das Recht auf Auskunft, Berichtigung, Löschung und Einschränkung der
               Verarbeitung deiner Daten sowie ein Beschwerderecht bei einer
-              Datenschutz-Aufsichtsbehörde. Schreib uns dafür einfach an [E-Mail-Adresse] oder
+              Datenschutz-Aufsichtsbehörde. Schreib uns dafür einfach an felixbaumann404@gmail.com oder
               über das Kontaktformular.
             </p>
           </div>

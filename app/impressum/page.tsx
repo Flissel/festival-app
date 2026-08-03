@@ -28,7 +28,7 @@ export default function ImpressumPage() {
 
           <div>
             <h2 className="text-lg font-semibold text-white">Kontakt</h2>
-            <p className="mt-2">E-Mail: [E-Mail-Adresse]</p>
+            <p className="mt-2">E-Mail: felixbaumann404@gmail.com</p>
           </div>
 
           <div>
