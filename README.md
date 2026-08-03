@@ -72,9 +72,8 @@ Optional:
 - `RSVP_CAPACITY` — maximale Gesamt-Gästezahl (inkl. Begleitpersonen); leer lassen
   für unbegrenzt. Bei Erreichen landen neue Anmeldungen auf der Warteliste.
 - `APP_BASE_URL` — öffentliche Basis-URL, wird für Links in E-Mails genutzt
-- `PAYPAL_ME_URL` — PayPal.me-Kürzel oder ganze URL; ohne den Wert zeigt die
-  Einladungsseite keinen PayPal-Link. Anlegen unter
-  <https://www.paypal.com/paypalme/grab>
+- `PAYPAL_ME_URL` — überschreibt das PayPal.me-Kürzel aus
+  [`lib/donation.ts`](lib/donation.ts); nur nötig, wenn das Geld woanders hin soll
 - `DONATION_IBAN`/`DONATION_IBAN_HOLDER` — Bankverbindung für alle, die lieber
   überweisen
 - `OPENCLAW_GATEWAY_URL`/`OPENCLAW_GATEWAY_TOKEN` — ohne diese Werte geht keine
@@ -147,7 +146,12 @@ Kasten weist ihn darauf hin.
 Die Kehrseite: Es gibt keinen Rückkanal. Die App erfährt nicht, ob jemand
 gezahlt hat. Eingänge trägt die Orga im Admin unter *Gäste* von Hand ein,
 genau wie Bargeld. `/admin/spenden` zeigt den hinterlegten Link zum Anklicken
-und meldet, wenn `PAYPAL_ME_URL` fehlt oder unbrauchbar ist.
+und meldet, wenn das Kürzel unbrauchbar ist.
+
+Das Kürzel steht in [`lib/donation.ts`](lib/donation.ts) — es erscheint ohnehin
+auf der Einladungsseite und ist damit so öffentlich wie Termin und Ort. Die
+Bankverbindung dagegen kommt nur aus `DONATION_IBAN`/`DONATION_IBAN_HOLDER`
+und liegt nicht im Repository.
 
 Die GitHub-Actions-CI (`.github/workflows/ci.yml`) führt alle drei Checks bei jedem
 Push und Pull Request aus.
