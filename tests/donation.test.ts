@@ -76,3 +76,30 @@ describe("formatIban", () => {
     expect(formatIban("DE89370400440532013000")).toBe("DE89 3704 0044 0532 0130 00");
   });
 });
+
+describe("donationConfig", () => {
+  it("nimmt das Kürzel aus lib/donation.ts, wenn keine Variable gesetzt ist", async () => {
+    delete process.env.PAYPAL_ME_URL;
+    const { donationConfig } = await import("@/lib/donation");
+    const config = donationConfig();
+    expect(config.paypalMeHandle).toBe("Flissl404");
+    expect(config.problems).toHaveLength(0);
+  });
+
+  it("lässt sich über PAYPAL_ME_URL überschreiben", async () => {
+    process.env.PAYPAL_ME_URL = "https://paypal.me/jemandanderes";
+    const { donationConfig } = await import("@/lib/donation");
+    expect(donationConfig().paypalMeHandle).toBe("jemandanderes");
+    delete process.env.PAYPAL_ME_URL;
+  });
+
+  it("meldet eine unbrauchbare Überschreibung, statt still auf die Vorgabe zurückzufallen", async () => {
+    // Sonst spendeten alle weiter an das alte Konto, ohne dass es auffällt.
+    process.env.PAYPAL_ME_URL = "DE89370400440532013000";
+    const { donationConfig } = await import("@/lib/donation");
+    const config = donationConfig();
+    expect(config.paypalMeHandle).toBeNull();
+    expect(config.problems[0]?.field).toBe("PAYPAL_ME_URL");
+    delete process.env.PAYPAL_ME_URL;
+  });
+});

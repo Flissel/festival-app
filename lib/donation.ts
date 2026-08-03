@@ -9,6 +9,12 @@
 // Rückkanal von PayPal, kein Webhook, keine Buchungs-ID. Wer wie viel gegeben
 // hat, trägt die Orga im Admin ein, nachdem sie es im PayPal-Konto gesehen hat.
 
+// Das Kürzel steht auf der Einladungsseite und ist damit ohnehin öffentlich —
+// wie Termin und Ort in lib/event.ts und lib/venue.ts. Deshalb hier und nicht
+// nur in den Umgebungsvariablen: So funktioniert der Spendenkasten ohne
+// weitere Einrichtung. PAYPAL_ME_URL überschreibt den Wert, falls nötig.
+const DEFAULT_PAYPAL_ME = "Flissl404";
+
 /** Was in der Umgebung fehlt oder falsch aussieht — für die Admin-Anzeige. */
 export type DonationProblem = { field: string; message: string };
 
@@ -66,21 +72,14 @@ export function formatIban(iban: string): string {
 export function donationConfig(): DonationConfig {
   const problems: DonationProblem[] = [];
 
-  const rawHandle = process.env.PAYPAL_ME_URL?.trim() ?? "";
-  let paypalMeHandle: string | null = null;
-  if (!rawHandle) {
+  const override = process.env.PAYPAL_ME_URL?.trim() ?? "";
+  const rawHandle = override || DEFAULT_PAYPAL_ME;
+  const paypalMeHandle = normalizePaypalMeHandle(rawHandle);
+  if (!paypalMeHandle) {
     problems.push({
-      field: "PAYPAL_ME_URL",
-      message: "Nicht gesetzt — auf der Einladungsseite gibt es keinen PayPal-Link.",
+      field: override ? "PAYPAL_ME_URL" : "DEFAULT_PAYPAL_ME",
+      message: `„${rawHandle}" ergibt kein gültiges PayPal.me-Kürzel. Erwartet wird z. B. „felixmustermann" oder „https://paypal.me/felixmustermann".`,
     });
-  } else {
-    paypalMeHandle = normalizePaypalMeHandle(rawHandle);
-    if (!paypalMeHandle) {
-      problems.push({
-        field: "PAYPAL_ME_URL",
-        message: `„${rawHandle}" ergibt kein gültiges PayPal.me-Kürzel. Erwartet wird z. B. „felixmustermann" oder „https://paypal.me/felixmustermann".`,
-      });
-    }
   }
 
   const rawIban = process.env.DONATION_IBAN?.trim() ?? "";
