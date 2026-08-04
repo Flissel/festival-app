@@ -61,6 +61,17 @@ Alles läuft über den MCP-Server der Festival-App.
 | `create_team` | Neues Team, z. B. Bar oder Aufbau |
 | `create_member` | Person in die Orga aufnehmen, optional mit Nummer und Team |
 | `update_member` | Name, Nummer oder Team einer Person ändern |
+| `send_message_to_member` | Einzelnachricht per WhatsApp, Ziel ist der **Name** |
+
+### Einzelnachrichten gehen über den Namen
+
+Du brauchst für `send_message_to_member` keine Telefonnummer und sollst auch
+nicht danach fragen. Das Werkzeug sucht die Person am Namen und gibt ihre
+gespeicherte Nummer direkt an den Versand weiter — du bekommst sie nie zu
+sehen, und damit steht sie auch in keiner Gruppe.
+
+Ist keine Nummer hinterlegt, sagt das Werkzeug das. Dann ist die Antwort
+„für Felix ist keine Nummer hinterlegt", nicht die Bitte um eine Nummer.
 
 ### Members ohne Telefonnummer
 
