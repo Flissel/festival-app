@@ -1,7 +1,10 @@
 import { prisma } from "@/lib/prisma";
 import { donationConfig, formatIban, paypalMeLink } from "@/lib/donation";
+import { isMailboxConfigured } from "@/lib/mailbox";
+import { matchGuest } from "@/lib/paymentNotices";
 import { RecordPaymentForm } from "@/components/admin/RecordPaymentForm";
 import { DeletePaymentButton } from "@/components/admin/DeletePaymentButton";
+import { NoticeInbox, type NoticeRow } from "@/components/admin/NoticeInbox";
 
 export const dynamic = "force-dynamic";
 
@@ -14,12 +17,37 @@ export default async function AdminDonationsPage() {
   const guests = await prisma.guest.findMany({
     where: { waitlisted: false },
     orderBy: { name: "asc" },
-    select: { id: true, name: true },
+    select: { id: true, name: true, email: true },
   });
   const payments = await prisma.payment.findMany({
     orderBy: { createdAt: "desc" },
     take: 50,
     include: { guest: { select: { name: true } } },
+  });
+  const openNotices = await prisma.paymentNotice.findMany({
+    where: { status: "neu" },
+    orderBy: { receivedAt: "desc" },
+    take: 50,
+  });
+
+  const noticeRows: NoticeRow[] = openNotices.map((notice) => {
+    const match = matchGuest(notice, guests);
+    return {
+      id: notice.id,
+      receivedAt: notice.receivedAt.toLocaleDateString("de-DE"),
+      // Leer statt „0", wenn der Betrag nicht zu lesen war — ein vorbelegtes
+      // Feld mit einer erfundenen Zahl wird zu schnell durchgewinkt.
+      amountInput:
+        notice.amountCents === null
+          ? ""
+          : (notice.amountCents / 100).toFixed(2).replace(".", ","),
+      senderName: notice.senderName,
+      senderEmail: notice.senderEmail,
+      subject: notice.subject,
+      dkimVerified: notice.dkimVerified,
+      suggestedGuestId: match?.guestId ?? "",
+      suggestionReason: match?.reason ?? null,
+    };
   });
 
   const completed = payments.filter((payment) => payment.status === "completed");
@@ -86,10 +114,12 @@ export default async function AdminDonationsPage() {
           und wie viel jemand gezahlt hat. Es gibt keinen Rückkanal von PayPal.
         </p>
         <p className="mt-2">
-          Deshalb ist die Liste unten reine Handarbeit: Du siehst den Eingang in
-          deinem PayPal-Konto und trägst ihn hier ein. Genau so wie Bargeld, das
-          jemand vor Ort in die Kasse legt. Mehrere Beiträge derselben Person
-          sind kein Problem — jeder wird eine eigene Zeile.
+          Was die App bekommt, ist die Benachrichtigungsmail, die PayPal dir für
+          jeden Eingang schickt. Die liest sie aus deinem Postfach und legt dir
+          die Eingänge unten zur Durchsicht hin. Bestätigen musst du jeden
+          selbst — die Mail ist ein Hinweis, kein Beleg. Was dort nicht auftaucht
+          (Bargeld, Überweisung), trägst du von Hand ein. Mehrere Beiträge
+          derselben Person sind kein Problem, jeder wird eine eigene Zeile.
         </p>
         <p className="mt-2">
           Der Hinweis auf der Einladungsseite bittet darum, &bdquo;An einen Freund&ldquo;
@@ -98,6 +128,12 @@ export default async function AdminDonationsPage() {
           abgeschickt hat.
         </p>
       </div>
+
+      <NoticeInbox
+        notices={noticeRows}
+        guests={guests}
+        mailboxConfigured={isMailboxConfigured()}
+      />
 
       <div>
         <h2 className="mb-3 text-lg font-semibold">

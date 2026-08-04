@@ -21,7 +21,9 @@ Orga verwaltet Gäste, Aufgaben, Budget und Teams im passwortgeschützten Admin-
   (Plan-/Ist-Kosten, Fälligkeitsdaten, Status-Filter), Teams & Members,
   Broadcast über das OpenClaw-Gateway
 - **Spenden** unter `/admin/spenden`: zeigt, wohin die Einladungsseite verweist, ob
-  die Angaben stimmen und was bisher eingetragen wurde
+  die Angaben stimmen und was bisher eingetragen wurde; liest die
+  PayPal-Benachrichtigungen aus dem Gmail-Postfach und legt Eingänge zur
+  Bestätigung vor
 - **Event-Daten** unter `/admin/event`: Name, Beginn, Ende und Line-up ohne Deploy
   ändern; schlägt auf Einladung, Kalenderdatei, Vorschaubild und Mails durch
 - **Verlauf** unter `/admin/verlauf`: wer hat was geändert — aus dem Admin und aus
@@ -167,10 +169,29 @@ und das kostet pro Zahlung Gebühren (2,49 % + 0,35 €). Über den Link kann de
 Gast „An einen Freund" wählen — innerhalb der EU in Euro gebührenfrei. Der
 Kasten weist ihn darauf hin.
 
-Die Kehrseite: Es gibt keinen Rückkanal. Die App erfährt nicht, ob jemand
-gezahlt hat. Eingänge trägt die Orga im Admin unter *Gäste* von Hand ein,
-genau wie Bargeld. `/admin/spenden` zeigt den hinterlegten Link zum Anklicken
-und meldet, wenn das Kürzel unbrauchbar ist.
+Die Kehrseite: Es gibt keinen Rückkanal. PayPal meldet der App nichts — kein
+Webhook, keine Abfrage. Die Transaction-Search-API könnte das, setzt aber
+wiederum ein Geschäftskonto voraus, und Geschäftskonten können „Freunde und
+Familie" gar nicht empfangen. Gebührenfrei **oder** automatisch, nicht beides.
+
+Was bleibt, ist die Benachrichtigungsmail, die PayPal für jeden Eingang
+verschickt. `/admin/spenden` liest sie per IMAP aus dem Gmail-Postfach
+(`GMAIL_USER`/`GMAIL_APP_PASSWORD`, dieselben Zugangsdaten wie für den Versand)
+und legt die Eingänge zur Durchsicht ab:
+
+- Gefunden wird nur, was von einer PayPal-Domain kommt und nach Eingang
+  aussieht; Belege, Rückerstattungen und Werbung fallen raus.
+- Betrag, Absender und Transaktionscode kommen aus dem Mailtext. Steht dort
+  kein eindeutiger Betrag, bleibt das Feld leer, statt eine Zahl zu raten.
+- Die Zuordnung zum Gast läuft über die E-Mail-Adresse, ersatzweise über den
+  Namen. Bei zwei Gästen gleichen Namens wird nichts vorgeschlagen.
+- Gebucht wird erst per Klick auf *Übernehmen*. Bis dahin ist die Zeile ein
+  Hinweis, kein Beleg — eine Absenderadresse lässt sich fälschen. Ob Google die
+  DKIM-Signatur von PayPal bestätigt hat, steht an der Zeile.
+
+Bargeld und Überweisungen tauchen dort naturgemäß nicht auf; die trägt die Orga
+im selben Bildschirm von Hand ein. `/admin/spenden` zeigt außerdem den
+hinterlegten Link zum Anklicken und meldet, wenn das Kürzel unbrauchbar ist.
 
 Das Kürzel steht in [`lib/donation.ts`](lib/donation.ts) — es erscheint ohnehin
 auf der Einladungsseite und ist damit so öffentlich wie Termin und Ort. Die

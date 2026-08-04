@@ -12,7 +12,12 @@ export async function DELETE(_request: Request, { params }: { params: Promise<{ 
 
   const payment = await prisma.payment.findUnique({
     where: { id },
-    include: { guest: { select: { id: true, name: true } } },
+    include: {
+      guest: { select: { id: true, name: true } },
+      // Muss vor dem Löschen gelesen werden: Der Fremdschlüssel steht auf
+      // SetNull, danach zeigt nichts mehr auf diese Zahlung.
+      notice: { select: { id: true } },
+    },
   });
   if (!payment) {
     return NextResponse.json({ error: "Eintrag nicht gefunden" }, { status: 404 });
@@ -25,6 +30,17 @@ export async function DELETE(_request: Request, { params }: { params: Promise<{ 
       return NextResponse.json({ error: "Eintrag war schon gelöscht" }, { status: 404 });
     }
     throw error;
+  }
+
+  // Kam der Beitrag aus einer PayPal-Mail, gehört der Eingang wieder in die
+  // Vorschlagsliste. Ohne das verschwände das Geld doppelt: einmal aus der
+  // Kasse und einmal aus der Liste der Dinge, die noch einzutragen sind — und
+  // wieder auffindbar wäre es nur im Postfach.
+  if (payment.notice) {
+    await prisma.paymentNotice.update({
+      where: { id: payment.notice.id },
+      data: { status: "neu" },
+    });
   }
 
   // Bleibt nichts mehr übrig, ist der Gast auch nicht mehr als bezahlt zu
@@ -48,6 +64,10 @@ export async function DELETE(_request: Request, { params }: { params: Promise<{ 
     summary: `Beitrag über ${Number(payment.amount).toFixed(2)} € von ${payment.guest.name} entfernt`,
   });
 
-  logger.info("admin.payment_deleted", { paymentId: id, guestId: payment.guestId });
+  logger.info("admin.payment_deleted", {
+    paymentId: id,
+    guestId: payment.guestId,
+    noticeRestored: Boolean(payment.notice),
+  });
   return NextResponse.json({ status: "ok" });
 }

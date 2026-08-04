@@ -27,6 +27,16 @@ enum TaskStatus {
   done
 }
 
+// Was mit einem erkannten Zahlungseingang passiert ist.
+enum NoticeStatus {
+  // Liegt zur Durchsicht — steht noch in keiner Kasse.
+  neu
+  // Wurde zu einem Beitrag gemacht.
+  uebernommen
+  // Bewusst weggeklickt: keine Spende, sondern etwas anderes.
+  ignoriert
+}
+
 enum RequestStatus {
   open
   answered
@@ -72,6 +82,54 @@ model Payment {
   status        PaymentRecordStatus  @default(pending)
   createdAt     DateTime             @default(now())
   completedAt   DateTime?
+  // Gesetzt, wenn der Beitrag aus einer Benachrichtigungsmail übernommen wurde
+  // statt von Hand eingetippt zu werden.
+  notice        PaymentNotice?
+}
+
+// Ein Zahlungseingang, den die App in einer PayPal-Benachrichtigungsmail
+// gefunden hat.
+//
+// Ausdrücklich kein Beleg und keine Buchung: Die Zeile hier ist ein Vorschlag,
+// den die Orga ansieht und entweder übernimmt oder wegklickt. Erst beim
+// Übernehmen entsteht ein Payment. Der Grund ist der Weg, auf dem die Angaben
+// entstanden sind — aus dem Fließtext einer E-Mail geraten, nicht von PayPal
+// bestätigt. Eine gefälschte Absenderadresse ist schnell geschrieben; deshalb
+// darf aus dieser Zeile nie von selbst Geld im Kassenstand werden.
+model PaymentNotice {
+  id String @id @default(cuid())
+
+  // Der Message-ID-Header der Mail. Eindeutig, damit ein zweiter Abruf
+  // dieselben Mails nicht ein zweites Mal in die Liste legt. Die IMAP-Nummer
+  // taugt dafür nicht — die vergibt der Server neu, wenn das Postfach
+  // aufgeräumt wird.
+  messageId String @unique
+
+  receivedAt DateTime
+  // In Cent, damit zwischen Mail und Kasse nichts gerundet wird. Null heißt:
+  // Im Text stand kein eindeutiger Betrag, die Orga muss ihn eintippen.
+  amountCents     Int?
+  currency        String  @default("EUR")
+  senderName      String?
+  senderEmail     String?
+  transactionCode String?
+  // Der Betreff, damit im Zweifel nachvollziehbar ist, woher die Zeile kommt.
+  subject String
+
+  // Hat Google die DKIM-Signatur von PayPal bestätigt? Ohne das ist die Mail
+  // nicht mehr als eine Behauptung über ihren Absender.
+  dkimVerified Boolean @default(false)
+
+  status NoticeStatus @default(neu)
+
+  // Gesetzt, sobald daraus ein Beitrag geworden ist.
+  payment   Payment? @relation(fields: [paymentId], references: [id], onDelete: SetNull)
+  paymentId String?  @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status, receivedAt])
 }
 
 model BudgetCategory {
