@@ -33,7 +33,7 @@ export default async function AdminAuditPage() {
         <h1 className="text-2xl font-bold">Verlauf</h1>
         <p className="mt-1 text-sm text-white/60">
           Wer hat was geändert — aus dem Admin und aus der Orga-Gruppe. Bei Änderungen
-          über den Chat ist der Urheber das, was OpenClaw meldet: ein Protokoll, keine
+          aus der Gruppe ist der Urheber das, was der Bot meldet: ein Protokoll, keine
           Zugangskontrolle.
         </p>
       </div>
