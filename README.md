@@ -1,36 +1,194 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Festival-App
 
-## Getting Started
+Einladungs- und Orga-App für unser Festival: Gäste melden sich über die öffentliche
+Einladungsseite an und geben freiwillig etwas dazu (PayPal oder bar), die
+Orga verwaltet Gäste, Aufgaben, Budget und Teams im passwortgeschützten Admin-Bereich.
 
-First, run the development server:
+## Features
+
+- **Einladungsseite** mit Termin, „Zum Kalender hinzufügen"-Button (`.ics`),
+  Anfahrtskarte, datensparsamem Anmeldeformular (Name, E-Mail, Begleitpersonen)
+  und Datenschutzhinweis
+- **Freiwilliger Beitrag**: PayPal.me-Link mit vorbelegtem Betrag oder Bankverbindung,
+  Bestätigungsmail per Gmail; wer erst später etwas geben will, kommt über den Link
+  in der Mail (`/zahlung/<id>`) zurück
+- **Warteliste**: Bei erreichter Kapazität (`RSVP_CAPACITY`) landen neue Anmeldungen
+  automatisch auf der Warteliste; Nachrücken per Klick im Admin inkl. Info-Mail
+- **Kontaktformular** mit Anfragen-Inbox im Admin, E-Mail-Benachrichtigung an die Orga
+  und Antwort direkt aus dem Admin
+- **Admin-Dashboard**: Gästeliste (bearbeiten, löschen, als bezahlt markieren,
+  CSV-Export für die Türliste), Aufgaben-Board mit Budgetkategorien
+  (Plan-/Ist-Kosten, Fälligkeitsdaten, Status-Filter), Teams & Members,
+  Broadcast über das OpenClaw-Gateway
+- **Spenden** unter `/admin/spenden`: zeigt, wohin die Einladungsseite verweist, ob
+  die Angaben stimmen und was bisher eingetragen wurde
+- **Event-Daten** unter `/admin/event`: Name, Beginn, Ende und Line-up ohne Deploy
+  ändern; schlägt auf Einladung, Kalenderdatei, Vorschaubild und Mails durch
+- **Verlauf** unter `/admin/verlauf`: wer hat was geändert — aus dem Admin und aus
+  der Orga-Gruppe
+- **MCP-Server** unter `/api/mcp` (Bearer-Token) als Datenzugang für OpenClaw
+- **Spam-Schutz**: Honeypot-Felder und Rate-Limiting auf allen öffentlichen Endpunkten
+
+## Stack
+
+Next.js (App Router) · React · Tailwind CSS · Prisma + PostgreSQL · Zod ·
+Nodemailer (Gmail)
+
+## Setup
 
 ```bash
+npm install
+cp .env.example .env   # Werte eintragen, siehe Kommentare in der Datei
+npx prisma migrate dev # legt die Datenbank an
+npm run db:seed        # Orga-Plan als Kategorien + Aufgaben
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Orga-Plan
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Der abgestimmte Orga-Plan steht als Daten in `lib/orgaPlan.ts` — 9 Kategorien
+(Getränke, Essen, Musik, die vier Areas, Steg, Ideen) mit 33 Aufgaben. In die
+Datenbank kommt er auf zwei Wegen, die dieselbe Funktion benutzen:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Im Admin** unter *Aufgaben* → Button „Orga-Plan einspielen". Kein Terminal
+  und keine Datenbank-Zugangsdaten nötig; danach sehen ihn alle Admins.
+- **Per Kommandozeile** mit `npm run db:seed`.
 
-## Learn More
+Beides ist idempotent: Kategorien und Aufgaben werden am Namen wiedererkannt,
+ein zweiter Lauf ergänzt nur, was neu ist, und fasst Status, Zuweisungen und
+Kosten aus dem Admin nicht an. Wächst der Plan, kommen die neuen Zeilen in
+`lib/orgaPlan.ts` und der Import läuft nochmal.
 
-To learn more about Next.js, take a look at the following resources:
+Admin-Passwort-Hash für `ADMIN_PASSWORD_HASH` erzeugen:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm run admin:hash -- "dein-passwort"
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Der Admin-Bereich liegt unter [`/admin`](http://localhost:3000/admin).
 
-## Deploy on Vercel
+## Konfiguration
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Alle Umgebungsvariablen sind in [`.env.example`](.env.example) dokumentiert.
+Optional:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `RSVP_CAPACITY` — maximale Gesamt-Gästezahl (inkl. Begleitpersonen); leer lassen
+  für unbegrenzt. Bei Erreichen landen neue Anmeldungen auf der Warteliste.
+- `APP_BASE_URL` — öffentliche Basis-URL, wird für Links in E-Mails genutzt
+- `PAYPAL_ME_URL` — überschreibt das PayPal.me-Kürzel aus
+  [`lib/donation.ts`](lib/donation.ts); nur nötig, wenn das Geld woanders hin soll
+- `DONATION_IBAN`/`DONATION_IBAN_HOLDER` — Bankverbindung für alle, die lieber
+  überweisen
+- `OPENCLAW_GATEWAY_URL`/`OPENCLAW_GATEWAY_TOKEN` — ohne diese Werte geht keine
+  Nachricht raus; der Broadcast weist im Admin darauf hin
+- `OPENCLAW_CHANNEL` — Kanalname für das Gateway, Standard `telegram`
+- `TELEGRAM_GROUP_CHAT_ID` — Chat-ID der Orga-Gruppe; nur damit lässt sich eine
+  Nachricht an die Gruppe statt einzeln an alle Members schicken
+- `MCP_SERVER_TOKEN` — ohne Token ist der MCP-Endpunkt deaktiviert
+
+## Termin und Line-up
+
+Name, Beginn, Ende und Line-up stehen in der Datenbank und werden im Admin unter
+*Event* gepflegt. Solange dort nichts gespeichert wurde, gelten die Vorgaben aus
+[`lib/event.ts`](lib/event.ts) — die Einladung steht also vom ersten Aufruf an.
+
+Beginn und Ende sind echte Zeitpunkte, keine Textzeile: Aus „ab 13 Uhr" lässt
+sich kein Kalendereintrag bauen. Eingegeben wird deutsche Ortszeit
+(`Europe/Berlin`), gespeichert wird in UTC, und `/kalender.ics` liefert daraus
+eine Kalenderdatei mit Termin, Ort und Koordinaten.
+
+Die Location steht weiterhin in [`lib/venue.ts`](lib/venue.ts).
+
+## OpenClaw als Orga-Assistent
+
+Der Bot lebt in der Telegram-Orga-Gruppe und pflegt über den MCP-Server unter
+`/api/mcp` die Aufgaben- und Budgetdaten. Sein Zuschnitt steht in
+[`openclaw/Soul.md`](openclaw/Soul.md) — dort sind Rolle, Ton, Werkzeugkatalog
+und die Grenzen beschrieben, die er einhalten soll.
+
+Aufteilung: **OpenClaw hält den Telegram-Bot**, die App ist die Datenschicht.
+In der App steckt kein Telegram-Code; sie stellt nur Werkzeuge bereit.
+
+Was der Bot kann: Aufgaben auflisten, anlegen, ändern, zuweisen und löschen,
+Members und Teams anlegen und ändern, Kategorien und Budget lesen, den
+Orga-Plan einspielen und den Änderungsverlauf zeigen.
+
+Die Telefonnummer eines Members ist freiwillig. Ohne sie lassen sich Aufgaben
+zuweisen, aber keine Einzelnachrichten schicken — der Broadcast nennt die
+Betroffenen dann namentlich, statt sie stillschweigend zu überspringen.
+
+Was er bewusst nicht kann:
+
+- **Keine Gästedaten.** `get_guest_stats` liefert nur Zahlen — keine Namen, keine
+  E-Mail-Adressen. Was einmal in einem Gruppenchat steht, ist nicht mehr
+  einzufangen; die Liste mit Namen gibt es im Admin und als CSV.
+- **Keine Gäste anlegen, ändern oder löschen** und keine Zahlungen auslösen.
+- **Members und Teams nicht löschen.** Anlegen und ändern ja; wer aus der Orga
+  raus soll, wird im Admin entfernt.
+
+### Zugriff und Nachvollziehbarkeit
+
+Der `MCP_SERVER_TOKEN` ist die **einzige** Zugangskontrolle. Wer ihn hat, darf
+alles, was die Werkzeuge können — entsprechend gehört er nicht in die Gruppe,
+sondern nur in die OpenClaw-Konfiguration.
+
+Innerhalb der Gruppe darf jede Person Aufgaben pflegen; es gibt keine
+Rechteprüfung je Person. Dafür verlangt jedes schreibende Werkzeug einen
+`actor` — den Anzeigenamen der Person, die die Nachricht geschrieben hat. Das
+landet zusammen mit jeder Admin-Änderung im Verlauf unter `/admin/verlauf`.
+
+Wichtig zur Einordnung: `actor` ist **selbst gemeldet**. Es ist ein Protokoll,
+das zeigt, wie eine Änderung zustande kam — kein Nachweis, der einer
+absichtlichen Täuschung standhält.
+
+**Vor dem Launch:** Die Platzhalter in [`app/impressum/page.tsx`](app/impressum/page.tsx)
+und [`app/datenschutz/page.tsx`](app/datenschutz/page.tsx) (Name, Anschrift,
+Kontakt, Hosting-Angaben) müssen ersetzt werden.
+
+## Tests & Checks
+
+```bash
+npm run lint       # ESLint
+npm run typecheck  # TypeScript
+npm test           # Vitest (Auth, Validierung, Rate-Limiter, CSV, Orga-Plan)
+```
+
+### Spenden
+
+Die App wickelt **keine** Zahlung ab. Auf der Einladungsseite steht ein
+PayPal.me-Link mit vorbelegtem Betrag; das Geld geht direkt von Gast zu
+Veranstalter. Der Grund: Die PayPal-REST-API setzt ein Geschäftskonto voraus,
+und das kostet pro Zahlung Gebühren (2,49 % + 0,35 €). Über den Link kann der
+Gast „An einen Freund" wählen — innerhalb der EU in Euro gebührenfrei. Der
+Kasten weist ihn darauf hin.
+
+Die Kehrseite: Es gibt keinen Rückkanal. Die App erfährt nicht, ob jemand
+gezahlt hat. Eingänge trägt die Orga im Admin unter *Gäste* von Hand ein,
+genau wie Bargeld. `/admin/spenden` zeigt den hinterlegten Link zum Anklicken
+und meldet, wenn das Kürzel unbrauchbar ist.
+
+Das Kürzel steht in [`lib/donation.ts`](lib/donation.ts) — es erscheint ohnehin
+auf der Einladungsseite und ist damit so öffentlich wie Termin und Ort. Die
+Bankverbindung dagegen kommt nur aus `DONATION_IBAN`/`DONATION_IBAN_HOLDER`
+und liegt nicht im Repository.
+
+Die GitHub-Actions-CI (`.github/workflows/ci.yml`) führt alle drei Checks bei jedem
+Push und Pull Request aus.
+
+## Deployment
+
+Das Projekt ist für Vercel mit einer Postgres-Datenbank (z. B. Neon) ausgelegt.
+`npm run build` führt `prisma generate` und `prisma migrate deploy` aus, Migrationen
+werden also beim Deploy automatisch angewendet. Nach dem ersten Deploy einmalig
+`npm run db:seed` gegen die Produktions-Datenbank ausführen — oder stattdessen im
+Admin unter *Aufgaben* auf „Orga-Plan einspielen" klicken.
+
+Den Seed gegen die Datenbank einer Vercel-Umgebung laufen lassen:
+
+```bash
+npx vercel env pull .env --environment=production   # holt DATABASE_URL
+npm run db:seed
+```
+
+Ohne `--environment` zieht die CLI die Development-Variablen; für Preview
+entsprechend `--environment=preview`.

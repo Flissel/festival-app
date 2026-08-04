@@ -24,3 +24,32 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Kaleidoskop-Scheiben: liegen hinter dem Seiteninhalt und werden additiv
+   eingeblendet, damit Text darüber lesbar bleibt. Alle teilen sich dasselbe
+   Asset — Größe, Tempo und Farbton kommen aus dem Inline-Style. */
+.kaleidoscope-disc {
+  background-image: url("/kaleidoskop.svg");
+  background-size: contain;
+  background-repeat: no-repeat;
+  mix-blend-mode: screen;
+  transform-origin: 50% 50%;
+  animation-name: kaleidoscope-turn;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+@keyframes kaleidoscope-turn {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kaleidoscope-disc {
+    animation: none;
+  }
+}

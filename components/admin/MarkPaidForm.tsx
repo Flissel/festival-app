@@ -37,7 +37,10 @@ export function MarkPaidForm({ guestId }: { guestId: string }) {
         min={1}
         step="0.01"
         required
-        placeholder="Betrag €"
+        // Deckt beides ab: Bargeld vor Ort und PayPal-Eingänge, die wir hier
+        // von Hand nachtragen — die App bekommt von PayPal nichts mit.
+        aria-label="Erhaltenen Betrag eintragen"
+        placeholder="Erhalten €"
         value={amount}
         onChange={(event) => setAmount(event.target.value)}
         className="w-24 rounded-md border border-white/20 bg-black/20 px-2 py-1 text-sm"
@@ -47,7 +50,7 @@ export function MarkPaidForm({ guestId }: { guestId: string }) {
         disabled={submitting}
         className="rounded-md bg-white px-3 py-1 text-sm font-semibold text-black disabled:opacity-50"
       >
-        Als bezahlt markieren
+        Eintragen
       </button>
       {error && <span className="text-xs text-red-400">{error}</span>}
     </form>

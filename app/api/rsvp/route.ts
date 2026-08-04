@@ -2,10 +2,37 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { logger } from "@/lib/logger";
 import { rsvpSchema } from "@/lib/validation/rsvp";
-import { sendRsvpConfirmation } from "@/lib/email";
+import { sendRsvpConfirmation, sendWaitlistConfirmation } from "@/lib/email";
+import { checkRateLimit, clientIp, isHoneypotFilled } from "@/lib/rateLimit";
+import { isUniqueViolation } from "@/lib/prismaError";
+
+const DUPLICATE_MESSAGE =
+  "Mit dieser E-Mail-Adresse gibt es bereits eine Anmeldung. Für Änderungen schreib uns über das Kontaktformular.";
+
+function readCapacity(): number | null {
+  const raw = process.env.RSVP_CAPACITY;
+  if (!raw) return null;
+  const value = Number(raw);
+  return Number.isInteger(value) && value > 0 ? value : null;
+}
 
 export async function POST(request: NextRequest) {
+  const ip = clientIp(request);
+  if (!checkRateLimit({ key: `rsvp:${ip}`, limit: 5, windowMs: 10 * 60 * 1000 })) {
+    logger.warn("rsvp.rate_limited", { ip });
+    return NextResponse.json(
+      { error: "Zu viele Anmeldeversuche. Bitte warte ein paar Minuten." },
+      { status: 429 }
+    );
+  }
+
   const body: unknown = await request.json().catch(() => null);
+
+  if (isHoneypotFilled(body)) {
+    logger.warn("rsvp.honeypot_triggered", { ip });
+    return NextResponse.json({ guestId: "ok" });
+  }
+
   const parsed = rsvpSchema.safeParse(body);
 
   if (!parsed.success) {
@@ -15,31 +42,48 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const { name, email, phone, plusOnes, allergies, paymentMethod, amount } = parsed.data;
+  const { name, email, plusOnes } = parsed.data;
 
-  const guest = await prisma.guest.create({
-    data: {
-      name,
-      email,
-      phone: phone || null,
-      plusOnes,
-      allergies: allergies || null,
-      paymentStatus: paymentMethod === "cash" ? "cash_pending" : "pending",
-    },
+  const existing = await prisma.guest.findFirst({
+    where: { email: { equals: email, mode: "insensitive" } },
   });
+  if (existing) {
+    return NextResponse.json({ error: DUPLICATE_MESSAGE }, { status: 409 });
+  }
 
-  logger.info("rsvp.created", { guestId: guest.id, paymentMethod });
+  let waitlisted = false;
+  const capacity = readCapacity();
+  if (capacity !== null) {
+    const guests = await prisma.guest.findMany({
+      where: { waitlisted: false },
+      select: { plusOnes: true },
+    });
+    const current = guests.reduce((sum, guest) => sum + 1 + guest.plusOnes, 0);
+    waitlisted = current + 1 + plusOnes > capacity;
+  }
 
-  sendRsvpConfirmation({
-    to: email,
-    name,
-    paymentMethod,
-    amount: amount ?? null,
-  }).catch(() => {});
+  let guest;
+  try {
+    guest = await prisma.guest.create({
+      data: { name, email, plusOnes, waitlisted },
+    });
+  } catch (error) {
+    // Zwei Anmeldungen derselben Adresse im selben Moment kommen beide an der
+    // Prüfung oben vorbei — abgefangen wird das erst hier von der Datenbank.
+    if (isUniqueViolation(error)) {
+      return NextResponse.json({ error: DUPLICATE_MESSAGE }, { status: 409 });
+    }
+    throw error;
+  }
 
-  return NextResponse.json({
-    guestId: guest.id,
-    paymentMethod,
-    amount: amount ?? null,
-  });
+  logger.info("rsvp.created", { guestId: guest.id, waitlisted });
+
+  if (waitlisted) {
+    sendWaitlistConfirmation({ to: email, name }).catch(() => {});
+    return NextResponse.json({ guestId: guest.id, waitlisted: true });
+  }
+
+  sendRsvpConfirmation({ to: email, name, guestId: guest.id }).catch(() => {});
+
+  return NextResponse.json({ guestId: guest.id });
 }

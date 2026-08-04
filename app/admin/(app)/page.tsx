@@ -16,7 +16,12 @@ export default async function AdminDashboardPage() {
     }),
   ]);
 
-  const guestCount = guests.reduce((sum, guest) => sum + 1 + guest.plusOnes, 0);
+  const guestCount = guests
+    .filter((guest) => !guest.waitlisted)
+    .reduce((sum, guest) => sum + 1 + guest.plusOnes, 0);
+  const waitlistCount = guests
+    .filter((guest) => guest.waitlisted)
+    .reduce((sum, guest) => sum + 1 + guest.plusOnes, 0);
   const totalIncome = completedPayments.reduce((sum, payment) => sum + Number(payment.amount), 0);
   const totalSpent = categories.reduce(
     (sum, category) =>
@@ -32,13 +37,16 @@ export default async function AdminDashboardPage() {
         <div className="rounded-xl border border-white/10 bg-white/5 p-6">
           <p className="text-sm text-white/60">Gäste (inkl. Begleitpersonen)</p>
           <p className="mt-1 text-3xl font-bold">{guestCount}</p>
+          {waitlistCount > 0 && (
+            <p className="mt-1 text-xs text-amber-300">+ {waitlistCount} auf der Warteliste</p>
+          )}
         </div>
         <div className="rounded-xl border border-white/10 bg-white/5 p-6">
           <p className="text-sm text-white/60">Eingegangen</p>
           <p className="mt-1 text-3xl font-bold">{formatEuro(totalIncome)}</p>
         </div>
         <div className="rounded-xl border border-white/10 bg-white/5 p-6">
-          <p className="text-sm text-white/60">Verbleibend</p>
+          <p className="text-sm text-white/60">Kasse (Einnahmen − Ausgaben)</p>
           <p className="mt-1 text-3xl font-bold">{formatEuro(totalIncome - totalSpent)}</p>
         </div>
       </div>
@@ -52,7 +60,7 @@ export default async function AdminDashboardPage() {
                 <th className="px-4 py-2">Kategorie</th>
                 <th className="px-4 py-2">Geplant</th>
                 <th className="px-4 py-2">Ausgegeben</th>
-                <th className="px-4 py-2">Verbleibend</th>
+                <th className="px-4 py-2">Restbudget (Plan − Ist)</th>
               </tr>
             </thead>
             <tbody>

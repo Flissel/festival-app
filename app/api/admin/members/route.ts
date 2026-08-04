@@ -4,7 +4,9 @@ import { prisma } from "@/lib/prisma";
 
 const bodySchema = z.object({
   name: z.string().trim().min(1).max(100),
-  phone: z.string().trim().min(1).max(30),
+  // Optional: Wer jemanden nur zum Zuweisen von Aufgaben braucht, hat die
+  // Nummer oft nicht zur Hand.
+  phone: z.string().trim().max(30).optional(),
 });
 
 export async function POST(request: NextRequest) {
@@ -14,6 +16,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Ungültige Eingabe" }, { status: 400 });
   }
 
-  const member = await prisma.member.create({ data: parsed.data });
+  const member = await prisma.member.create({
+    data: { name: parsed.data.name, phone: parsed.data.phone || null },
+  });
   return NextResponse.json({ member });
 }

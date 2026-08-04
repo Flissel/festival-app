@@ -1,18 +1,13 @@
 import { prisma } from "@/lib/prisma";
+import { importOrgaPlan } from "@/lib/orgaPlan";
 
-const DEFAULT_CATEGORIES = ["Bar & Cocktails", "Sound/Technik", "Live-Acts", "Deko & Sonstiges"];
-
+// Dasselbe, was der Button "Orga-Plan einspielen" im Admin auslöst — hier für
+// den Fall, dass man die Datenbank direkt von der Kommandozeile befüllen will.
 async function main() {
-  const existing = await prisma.budgetCategory.count();
-  if (existing > 0) {
-    console.log("Kategorien bereits vorhanden, überspringe Seed.");
-    return;
-  }
-
-  for (const [index, name] of DEFAULT_CATEGORIES.entries()) {
-    await prisma.budgetCategory.create({ data: { name, sortOrder: index } });
-  }
-  console.log("Standard-Kategorien angelegt:", DEFAULT_CATEGORIES.join(", "));
+  const { createdCategories, createdTasks } = await importOrgaPlan(prisma);
+  console.log(
+    `Orga-Plan eingespielt: ${createdCategories} neue Kategorien, ${createdTasks} neue Aufgaben.`
+  );
 }
 
 main()

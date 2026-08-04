@@ -53,7 +53,9 @@ export default async function AdminMembersPage() {
               {members.map((member) => (
                 <tr key={member.id} className="border-t border-white/10">
                   <td className="px-4 py-2">{member.name}</td>
-                  <td className="px-4 py-2">{member.phone}</td>
+                  <td className="px-4 py-2">
+                    {member.phone ?? <span className="text-white/40">keine Nummer</span>}
+                  </td>
                   <td className="px-4 py-2">
                     <MemberTeamSelect
                       memberId={member.id}

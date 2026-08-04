@@ -32,14 +32,27 @@ enum RequestStatus {
   answered
 }
 
+// Woher eine Änderung kam. Im Admin sitzt eine angemeldete Person, über den
+// Chat schreibt OpenClaw im Auftrag einer Person aus der Telegram-Gruppe.
+enum AuditSource {
+  admin
+  chat
+  system
+}
+
+// Nur die drei Felder, die das Anmeldeformular erhebt. Telefon und Allergien
+// wurden entfernt, als das Formular verschlankt wurde — sie ließen sich nicht
+// mehr befüllen und hatten keinen Verwendungszweck.
 model Guest {
   id            String        @id @default(cuid())
   name          String
-  email         String
-  phone         String?
+  // Eindeutig, damit die Doppelanmeldungs-Prüfung nicht nur im Code steht:
+  // zwei gleichzeitige Anmeldungen mit derselben Adresse würden die reine
+  // Lesen-dann-Schreiben-Prüfung sonst beide passieren.
+  email         String        @unique
   plusOnes      Int           @default(0)
-  allergies     String?
   paymentStatus PaymentStatus @default(pending)
+  waitlisted    Boolean       @default(false)
   createdAt     DateTime      @default(now())
   payments      Payment[]
 }
@@ -50,7 +63,12 @@ model Payment {
   guestId       String
   amount        Decimal              @db.Decimal(10, 2)
   currency      String               @default("EUR")
+  // Beide Felder stammen aus der Zeit mit der PayPal-REST-API und werden nicht
+  // mehr geschrieben: Spenden laufen jetzt über einen PayPal.me-Link, von dem
+  // die App nichts mitbekommt. Die Spalten bleiben, damit die Belege der
+  // damaligen Buchungen erhalten bleiben.
   paypalOrderId String?              @unique
+  paypalCaptureId String?
   status        PaymentRecordStatus  @default(pending)
   createdAt     DateTime             @default(now())
   completedAt   DateTime?
@@ -58,7 +76,10 @@ model Payment {
 
 model BudgetCategory {
   id        String   @id @default(cuid())
-  name      String
+  // Eindeutig: Der Plan-Import und die Chat-Werkzeuge erkennen Kategorien am
+  // Namen. Ohne Constraint legen zwei gleichzeitige Zugriffe zwei Kategorien
+  // gleichen Namens an, und danach ist nicht mehr klar, welche gemeint ist.
+  name      String   @unique
   sortOrder Int      @default(0)
   tasks     Task[]
 }
@@ -74,7 +95,11 @@ model Team {
 model Member {
   id        String   @id @default(cuid())
   name      String
-  phone     String
+  // Optional: Wer über den Chat jemanden zur Orga hinzufügt, hat dessen Nummer
+  // selten zur Hand. Ohne Nummer geht alles außer Einzelnachricht und
+  // get_my_tasks — das melden die betroffenen Stellen namentlich, statt
+  // stillschweigend niemanden zu erreichen.
+  phone     String?
   createdAt DateTime @default(now())
   team      Team?    @relation(fields: [teamId], references: [id], onDelete: SetNull)
   teamId    String?
@@ -93,8 +118,33 @@ model Task {
   teamId         String?
   estimatedCost  Decimal?       @db.Decimal(10, 2)
   actualCost     Decimal?       @db.Decimal(10, 2)
+  dueDate        DateTime?
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
+
+  // Gleicher Grund wie bei der Kategorie: Import und Chat erkennen Aufgaben am
+  // Titel innerhalb ihrer Kategorie.
+  @@unique([categoryId, title])
+}
+
+// Wer hat was wann geändert. Bei fünf Leuten, die parallel im Admin und über
+// die Telegram-Gruppe pflegen, ist das der einzige Weg herauszufinden, warum
+// ein Eintrag plötzlich anders aussieht.
+//
+// Bei source = chat ist `actor` das, was OpenClaw als Urheber meldet — ein
+// Protokoll, keine Zugangskontrolle. Die Zugangskontrolle ist der MCP-Token.
+model AuditEntry {
+  id        String      @id @default(cuid())
+  at        DateTime    @default(now())
+  source    AuditSource
+  actor     String
+  action    String
+  entity    String
+  entityId  String?
+  summary   String
+  createdAt DateTime    @default(now())
+
+  @@index([at])
 }
 
 model Request {
@@ -105,4 +155,20 @@ model Request {
   status     RequestStatus @default(open)
   createdAt  DateTime      @default(now())
   answeredAt DateTime?
+}
+
+// Termin, Name und Line-up-Hinweis der Veranstaltung. Genau eine Zeile mit
+// fester Kennung: Es gibt ein Fest, nicht viele. Fehlt die Zeile, greifen die
+// Vorgaben aus lib/event.ts — die Einladung steht also auch vor dem ersten
+// Speichern im Admin.
+//
+// Beginn und Ende liegen bewusst als echte Zeitpunkte vor und nicht als Text:
+// Aus einem Satz wie "ab 13 Uhr" lässt sich kein Kalendereintrag bauen.
+model EventInfo {
+  id         String    @id
+  name       String
+  startsAt   DateTime?
+  endsAt     DateTime?
+  lineupNote String?
+  updatedAt  DateTime  @updatedAt
 }

@@ -1,4 +1,5 @@
 import { RequestForm } from "@/components/RequestForm";
+import { SiteFooter } from "@/components/SiteFooter";
 
 export default function AnfragePage() {
   return (
@@ -12,6 +13,8 @@ export default function AnfragePage() {
         </header>
 
         <RequestForm />
+
+        <SiteFooter />
       </div>
     </main>
   );

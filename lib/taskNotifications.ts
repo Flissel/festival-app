@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { sendWhatsAppMessage } from "@/lib/openclaw";
+import { sendToPhone } from "@/lib/openclaw";
 
 function assignmentMessage(name: string, taskTitle: string, categoryName: string): string {
   return `Hi ${name}, du bist für "${taskTitle}" (${categoryName}) eingeteilt. Danke!`;
@@ -15,8 +15,10 @@ export async function notifyTaskAssignment(params: {
 
   if (memberId) {
     const member = await prisma.member.findUnique({ where: { id: memberId } });
-    if (member) {
-      await sendWhatsAppMessage(member.phone, assignmentMessage(member.name, taskTitle, categoryName));
+    // Ohne Nummer gibt es keinen Weg, die Person zu erreichen — die Zuweisung
+    // gilt trotzdem, sie steht im Admin und in list_tasks.
+    if (member?.phone) {
+      await sendToPhone(member.phone, assignmentMessage(member.name, taskTitle, categoryName));
     }
     return;
   }
@@ -26,7 +28,9 @@ export async function notifyTaskAssignment(params: {
     if (team) {
       await Promise.all(
         team.members.map((member) =>
-          sendWhatsAppMessage(member.phone, assignmentMessage(member.name, taskTitle, categoryName))
+          member.phone
+            ? sendToPhone(member.phone, assignmentMessage(member.name, taskTitle, categoryName))
+            : Promise.resolve()
         )
       );
     }
