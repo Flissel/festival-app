@@ -63,7 +63,12 @@ export async function POST(request: NextRequest) {
   const results = await Promise.all(
     members.map(async (member) => ({
       name: member.name,
-      result: await sendToPhone(member.phone, message),
+      // Ohne hinterlegte Nummer gibt es niemanden anzuschreiben. Das zählt als
+      // Fehlschlag mit Begründung, nicht als stille Auslassung — sonst meldet
+      // der Broadcast Erfolg für Leute, die nie etwas bekommen haben.
+      result: member.phone
+        ? await sendToPhone(member.phone, message)
+        : ({ ok: false, error: "keine Telefonnummer hinterlegt" } as const),
     }))
   );
 

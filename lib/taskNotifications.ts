@@ -15,7 +15,9 @@ export async function notifyTaskAssignment(params: {
 
   if (memberId) {
     const member = await prisma.member.findUnique({ where: { id: memberId } });
-    if (member) {
+    // Ohne Nummer gibt es keinen Weg, die Person zu erreichen — die Zuweisung
+    // gilt trotzdem, sie steht im Admin und in list_tasks.
+    if (member?.phone) {
       await sendToPhone(member.phone, assignmentMessage(member.name, taskTitle, categoryName));
     }
     return;
@@ -26,7 +28,9 @@ export async function notifyTaskAssignment(params: {
     if (team) {
       await Promise.all(
         team.members.map((member) =>
-          sendToPhone(member.phone, assignmentMessage(member.name, taskTitle, categoryName))
+          member.phone
+            ? sendToPhone(member.phone, assignmentMessage(member.name, taskTitle, categoryName))
+            : Promise.resolve()
         )
       );
     }

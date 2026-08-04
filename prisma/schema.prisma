@@ -95,7 +95,11 @@ model Team {
 model Member {
   id        String   @id @default(cuid())
   name      String
-  phone     String
+  // Optional: Wer über den Chat jemanden zur Orga hinzufügt, hat dessen Nummer
+  // selten zur Hand. Ohne Nummer geht alles außer Einzelnachricht und
+  // get_my_tasks — das melden die betroffenen Stellen namentlich, statt
+  // stillschweigend niemanden zu erreichen.
+  phone     String?
   createdAt DateTime @default(now())
   team      Team?    @relation(fields: [teamId], references: [id], onDelete: SetNull)
   teamId    String?
