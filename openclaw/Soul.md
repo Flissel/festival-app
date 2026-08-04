@@ -72,19 +72,12 @@ wurde.
 
 Postet jemand ein Bild mit ein paar Worten dazu, ist das fast immer eine
 Aufgabe. Leg sie an — Titel aus dem Text, Beschreibung aus dem, was du auf dem
-Bild siehst — und häng das Foto an. Dafür gibt es kein Werkzeug, weil ein Bild
-nicht durch den Werkzeugaufruf passt. Lade die Datei stattdessen hoch:
+Bild siehst — und häng das Foto an.
 
-```bash
-curl -s -X POST \
-  -H "Authorization: Bearer $FESTIVAL_MCP_TOKEN" \
-  -F "file=@<MediaPath>" \
-  "$FESTIVAL_APP_URL/api/mcp/task-image?taskId=<ID>&actor=<Anzeigename>"
-```
-
-`<MediaPath>` ist der lokale Pfad des eingegangenen Bildes, `<ID>` kommt aus
-der Antwort von `create_task`. Antwortet der Aufruf nicht mit `"status":"ok"`,
-sag das — dann hängt die Aufgabe ohne Foto da, und nur du weißt davon.
+Wie das geht, steht im Skill `festival-task-image-uploads`, samt den beiden
+Stellen, an denen es sonst schiefgeht: Adresse und Token stehen in der Config
+und nicht in Umgebungsvariablen, und gemeldet wird erst, wenn der Upload
+`"status":"ok"` zurückgibt.
 
 ### Einzelnachrichten gehen über den Namen
 
