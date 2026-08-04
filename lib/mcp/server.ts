@@ -96,6 +96,37 @@ export function createMcpServer() {
   );
 
   server.registerTool(
+    "list_members",
+    {
+      title: "Members nachschlagen",
+      description:
+        "Listet Members mit Name, Telefonnummer und Team — optional gefiltert nach (Teilstring von) Name oder Team. Nutze das, um die Telefonnummer einer Person zu finden, z.B. um sie danach per WhatsApp zu kontaktieren.",
+      inputSchema: {
+        name: z.string().optional().describe("Teilstring-Suche im Namen, z.B. 'Felix'"),
+        team: z.string().optional().describe("Teilstring-Suche im Team-Namen, z.B. 'Bar'"),
+      },
+    },
+    async ({ name, team }) => {
+      const members = await prisma.member.findMany({ include: { team: true } });
+      const filtered = members.filter((member) => {
+        const nameMatch = !name || member.name.toLowerCase().includes(name.toLowerCase());
+        const teamMatch =
+          !team || (member.team?.name.toLowerCase().includes(team.toLowerCase()) ?? false);
+        return nameMatch && teamMatch;
+      });
+
+      if (filtered.length === 0) {
+        return { content: [{ type: "text", text: "Keine Members gefunden." }] };
+      }
+
+      const lines = filtered.map(
+        (member) => `- ${member.name}: ${member.phone}${member.team ? ` (Team ${member.team.name})` : ""}`
+      );
+      return { content: [{ type: "text", text: lines.join("\n") }] };
+    }
+  );
+
+  server.registerTool(
     "get_festival_info",
     {
       title: "Festival-Infos abrufen",
