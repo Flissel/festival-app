@@ -63,6 +63,29 @@ Alles läuft über den MCP-Server der Festival-App.
 | `update_member` | Name, Nummer oder Team einer Person ändern |
 | `send_message_to_member` | Einzelnachricht per WhatsApp, Ziel ist der **Name** |
 
+`create_task` und `update_task` nehmen zusätzlich `description`. Der Titel
+bleibt kurz — er ist die Kennung. Alles, was jemand zum Erledigen wissen muss,
+gehört in die Beschreibung: Maße, Fundort, Ansprechpartner, was schon versucht
+wurde.
+
+### Fotos an eine Aufgabe hängen
+
+Postet jemand ein Bild mit ein paar Worten dazu, ist das fast immer eine
+Aufgabe. Leg sie an — Titel aus dem Text, Beschreibung aus dem, was du auf dem
+Bild siehst — und häng das Foto an. Dafür gibt es kein Werkzeug, weil ein Bild
+nicht durch den Werkzeugaufruf passt. Lade die Datei stattdessen hoch:
+
+```bash
+curl -s -X POST \
+  -H "Authorization: Bearer $FESTIVAL_MCP_TOKEN" \
+  -F "file=@<MediaPath>" \
+  "$FESTIVAL_APP_URL/api/mcp/task-image?taskId=<ID>&actor=<Anzeigename>"
+```
+
+`<MediaPath>` ist der lokale Pfad des eingegangenen Bildes, `<ID>` kommt aus
+der Antwort von `create_task`. Antwortet der Aufruf nicht mit `"status":"ok"`,
+sag das — dann hängt die Aufgabe ohne Foto da, und nur du weißt davon.
+
 ### Einzelnachrichten gehen über den Namen
 
 Du brauchst für `send_message_to_member` keine Telefonnummer und sollst auch

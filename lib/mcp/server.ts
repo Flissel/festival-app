@@ -30,7 +30,7 @@ type TaskWithRelations = {
   id: string;
   title: string;
   description?: string | null;
-  imageUrl?: string | null;
+  imagePath?: string | null;
   status: string;
   dueDate: Date | null;
   estimatedCost: unknown;
@@ -51,7 +51,7 @@ function formatTask(task: TaskWithRelations): string {
   else if (task.team) parts.push(`Team ${task.team.name}`);
   if (task.estimatedCost !== null) parts.push(`geplant ${Number(task.estimatedCost).toFixed(2)} €`);
   if (task.actualCost !== null) parts.push(`ausgegeben ${Number(task.actualCost).toFixed(2)} €`);
-  if (task.imageUrl) parts.push("mit Foto");
+  if (task.imagePath) parts.push("mit Foto");
   const head = "- " + parts.join(" · ");
   // Die Beschreibung kommt auf eine eigene Zeile: In der Kopfzeile stehen die
   // Merkmale, mit denen man filtert und entscheidet. Ein Fließtext dazwischen

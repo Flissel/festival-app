@@ -87,6 +87,9 @@ Optional:
 - `TELEGRAM_GROUP_CHAT_ID` — Chat-ID der Orga-Gruppe; nur damit lässt sich eine
   Nachricht an die Gruppe statt einzeln an alle Members schicken
 - `MCP_SERVER_TOKEN` — ohne Token ist der MCP-Endpunkt deaktiviert
+- `BLOB_READ_WRITE_TOKEN` — Speicher für Fotos an Aufgaben; wird beim
+  Verbinden des Vercel-Blob-Speichers gesetzt. Der Speicher ist privat: Fotos
+  gehen nur über eine Route raus, die vorher die Admin-Sitzung prüft
 
 ## Termin und Line-up
 

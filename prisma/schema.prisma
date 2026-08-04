@@ -115,9 +115,11 @@ model Task {
   // muss — Maße, Ansprechpartner, wo das Zeug steht — gehört hierher, damit
   // der Titel nicht zum Absatz wird.
   description    String?
-  // Ein Foto sagt bei „welcher Anhänger?" mehr als drei Sätze. Liegt im Blob-
-  // Speicher, hier steht nur die URL.
-  imageUrl       String?
+  // Ein Foto sagt bei „welcher Anhänger?" mehr als drei Sätze. Die Datei liegt
+  // im Blob-Speicher, und der ist privat: Ausgeliefert wird sie nur über eine
+  // Route, die vorher die Admin-Sitzung prüft. Deshalb steht hier der Pfad im
+  // Speicher und keine öffentlich abrufbare URL.
+  imagePath      String?
   status         TaskStatus     @default(open)
   member         Member?        @relation(fields: [memberId], references: [id], onDelete: SetNull)
   memberId       String?

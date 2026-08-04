@@ -98,7 +98,7 @@ export default async function AdminTasksPage({
                           id: task.id,
                           title: task.title,
                           description: task.description,
-                          imageUrl: task.imageUrl,
+                          imagePath: task.imagePath,
                           status: task.status,
                           categoryName: category.name,
                           member: task.member

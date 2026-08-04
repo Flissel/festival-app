@@ -13,7 +13,7 @@ type Task = {
   id: string;
   title: string;
   description: string | null;
-  imageUrl: string | null;
+  imagePath: string | null;
   status: TaskStatus;
   categoryName: string;
   member: MemberRef | null;
@@ -50,6 +50,47 @@ export function TaskCard({
   const router = useRouter();
   const [actualCost, setActualCost] = useState(task.actualCost ?? "");
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [imageError, setImageError] = useState<string | null>(null);
+
+  // Der Pfad selbst wird nie geladen — er liegt im privaten Speicher. Diese
+  // Route reicht die Datei erst nach der Sitzungsprüfung durch. Der Pfad hängt
+  // als Parameter dran, damit der Browser nach einem Wechsel nicht das alte
+  // Bild aus dem Cache zeigt.
+  const imageSrc = `/api/admin/tasks/${task.id}/image?v=${encodeURIComponent(task.imagePath ?? "")}`;
+
+  async function uploadImage(file: File) {
+    setUploading(true);
+    setImageError(null);
+    try {
+      const body = new FormData();
+      body.append("file", file);
+      const response = await fetch(`/api/admin/tasks/${task.id}/image`, { method: "POST", body });
+      if (!response.ok) {
+        const data: unknown = await response.json().catch(() => null);
+        setImageError(
+          data && typeof data === "object" && "error" in data && typeof data.error === "string"
+            ? data.error
+            : "Das Foto konnte nicht gespeichert werden."
+        );
+        return;
+      }
+      router.refresh();
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  async function removeImage() {
+    setUploading(true);
+    setImageError(null);
+    try {
+      await fetch(`/api/admin/tasks/${task.id}/image`, { method: "DELETE" });
+      router.refresh();
+    } finally {
+      setUploading(false);
+    }
+  }
 
   async function updateTask(data: Record<string, unknown>) {
     setSaving(true);
@@ -89,19 +130,45 @@ export function TaskCard({
       {task.description && (
         <p className="mt-1 whitespace-pre-line text-xs text-white/60">{task.description}</p>
       )}
-      {task.imageUrl && (
-        <a href={task.imageUrl} target="_blank" rel="noopener noreferrer" className="mt-2 block">
-          {/* Kein next/image: Die URL zeigt auf den Blob-Speicher, und für ein
-              Vorschaubild im Board lohnt die Optimierungs-Pipeline nicht. */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={task.imageUrl}
-            alt={`Foto zu ${task.title}`}
-            className="max-h-32 w-full rounded-md border border-white/10 object-cover"
-            loading="lazy"
-          />
-        </a>
+      {task.imagePath && (
+        <div className="mt-2">
+          <a href={imageSrc} target="_blank" rel="noopener noreferrer" className="block">
+            {/* Kein next/image: Das Bild kommt aus einer Route, die erst die
+                Sitzung prüft, und für ein Vorschaubild im Board lohnt die
+                Optimierungs-Pipeline nicht. */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={imageSrc}
+              alt={`Foto zu ${task.title}`}
+              className="max-h-32 w-full rounded-md border border-white/10 object-cover"
+              loading="lazy"
+            />
+          </a>
+          <button
+            onClick={removeImage}
+            disabled={uploading}
+            className="mt-1 text-xs text-white/40 underline hover:text-white/70 disabled:opacity-50"
+          >
+            Foto entfernen
+          </button>
+        </div>
       )}
+
+      <label className="mt-2 block text-xs text-white/40 hover:text-white/70">
+        {uploading ? "Lädt hoch…" : task.imagePath ? "Foto ersetzen" : "+ Foto"}
+        <input
+          type="file"
+          accept="image/jpeg,image/png,image/webp,image/gif"
+          className="hidden"
+          disabled={uploading}
+          onChange={(event) => {
+            const file = event.target.files?.[0];
+            event.target.value = "";
+            if (file) uploadImage(file);
+          }}
+        />
+      </label>
+      {imageError && <p className="mt-1 text-xs text-red-400">{imageError}</p>}
       {overdue && <p className="mt-1 text-xs text-red-400">Überfällig</p>}
 
       <div className="mt-2 flex items-center gap-2">
