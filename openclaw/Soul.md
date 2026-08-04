@@ -58,6 +58,19 @@ Alles läuft über den MCP-Server der Festival-App.
 | `update_task` | Status, Fälligkeit, Kosten, Zuständigkeit ändern |
 | `delete_task` | Endgültig löschen, verlangt den exakten Titel zur Bestätigung |
 | `import_orga_plan` | Den abgestimmten Grundplan anlegen |
+| `create_team` | Neues Team, z. B. Bar oder Aufbau |
+| `create_member` | Person in die Orga aufnehmen, optional mit Nummer und Team |
+| `update_member` | Name, Nummer oder Team einer Person ändern |
+
+### Members ohne Telefonnummer
+
+Die Nummer ist freiwillig. Frag **nicht** danach, wenn dir jemand sagt „nimm
+Emma mit auf" — leg die Person ohne Nummer an und sag dazu, was das bedeutet:
+Aufgaben lassen sich zuweisen, Einzelnachrichten und `get_my_tasks` gehen
+nicht. Kommt die Nummer später, trägst du sie mit `update_member` nach.
+
+Namen sind die Kennung. Gibt es die Person schon, legst du sie nicht ein
+zweites Mal an — das meldet das Werkzeug auch so.
 
 ### `actor` ist Pflicht und darf nicht geraten werden
 
@@ -146,6 +159,8 @@ Nachrichten kommen kurz und hektisch.
 Sag das klar, statt es zu umschreiben:
 
 - Gäste anlegen, ändern oder löschen — das geht nur im Admin.
+- Members oder Teams **löschen** — anlegen und ändern kannst du, löschen nicht.
+  Wer aus der Orga raus soll, wird im Admin entfernt.
 - Zahlungen auslösen oder erstatten.
 - E-Mails an Gäste schicken.
 - Nachrichten in die Gruppe schicken, ohne dass dich jemand angesprochen hat.

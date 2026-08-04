@@ -21,8 +21,8 @@ function text(value: string) {
 
 async function findMemberByPhone(phone: string) {
   const target = normalizePhone(phone);
-  const members = await prisma.member.findMany();
-  return members.find((member) => normalizePhone(member.phone) === target) ?? null;
+  const members = await prisma.member.findMany({ where: { phone: { not: null } } });
+  return members.find((member) => normalizePhone(member.phone!) === target) ?? null;
 }
 
 type TaskWithRelations = {
@@ -557,6 +557,194 @@ export function createMcpServer() {
       return text(
         `Eingespielt: ${result.createdCategories} Kategorien und ${result.createdTasks} Aufgaben.`
       );
+    }
+  );
+
+  server.registerTool(
+    "create_team",
+    {
+      title: "Team anlegen",
+      description:
+        "Legt ein Team an, z. B. Bar oder Aufbau. Gibt es das Team schon, wird nichts angelegt und das vorhandene gemeldet.",
+      inputSchema: {
+        actor: actorSchema,
+        name: z.string().min(1).max(100).describe("Name des Teams"),
+      },
+    },
+    async ({ actor, name }) => {
+      const trimmed = name.trim();
+      if (!trimmed) return text("Ein Team braucht einen Namen.");
+
+      const existing = await prisma.team.findFirst({
+        where: { name: { equals: trimmed, mode: "insensitive" } },
+      });
+      if (existing) return text(`Team „${existing.name}" gibt es schon.`);
+
+      const team = await prisma.team.create({ data: { name: trimmed } });
+
+      await recordAudit({
+        source: "chat",
+        actor,
+        action: "team.create",
+        entity: "Team",
+        entityId: team.id,
+        summary: `Team „${team.name}" angelegt`,
+      });
+
+      return text(`Team „${team.name}" ist angelegt.`);
+    }
+  );
+
+  server.registerTool(
+    "create_member",
+    {
+      title: "Member anlegen",
+      description:
+        "Nimmt eine Person in die Orga auf. Die Telefonnummer ist freiwillig — ohne sie lassen sich Aufgaben zuweisen, aber keine Einzelnachrichten schicken. Ein noch nicht vorhandenes Team wird mit angelegt.",
+      inputSchema: {
+        actor: actorSchema,
+        name: z.string().min(1).max(100).describe("Name der Person"),
+        phone: z
+          .string()
+          .max(30)
+          .optional()
+          .describe("Telefonnummer, am besten mit Ländervorwahl. Weglassen, wenn unbekannt."),
+        team: z.string().max(100).optional().describe("Team, in das die Person kommt"),
+      },
+    },
+    async ({ actor, name, phone, team }) => {
+      const trimmed = name.trim();
+      if (!trimmed) return text("Ein Member braucht einen Namen.");
+
+      // Namen sind überall die Kennung — beim Zuweisen von Aufgaben, beim
+      // Ändern, beim Broadcast. Zwei gleiche Namen machen jede davon
+      // mehrdeutig, deshalb hier abbrechen statt raten.
+      const existing = await prisma.member.findFirst({
+        where: { name: { equals: trimmed, mode: "insensitive" } },
+      });
+      if (existing) {
+        return text(
+          `„${existing.name}" ist schon in der Orga. Für eine zweite Person mit gleichem Namen bitte einen unterscheidbaren Namen nehmen, z. B. „${existing.name} K.".`
+        );
+      }
+
+      let teamId: string | null = null;
+      let teamNote = "";
+      if (team?.trim()) {
+        const wanted = team.trim();
+        const found = await prisma.team.findFirst({
+          where: { name: { equals: wanted, mode: "insensitive" } },
+        });
+        if (found) {
+          teamId = found.id;
+          teamNote = `, Team ${found.name}`;
+        } else {
+          const created = await prisma.team.create({ data: { name: wanted } });
+          teamId = created.id;
+          teamNote = `, Team ${created.name} neu angelegt`;
+        }
+      }
+
+      const member = await prisma.member.create({
+        data: { name: trimmed, phone: phone?.trim() || null, teamId },
+      });
+
+      await recordAudit({
+        source: "chat",
+        actor,
+        action: "member.create",
+        entity: "Member",
+        entityId: member.id,
+        summary: `Member „${member.name}" angelegt${teamNote}`,
+      });
+
+      const missingPhone = member.phone
+        ? ""
+        : " Ohne Telefonnummer bekommt die Person keine Einzelnachrichten und kann ihre Aufgaben nicht per Nummer abrufen.";
+      return text(`„${member.name}" ist in der Orga${teamNote}.${missingPhone}`);
+    }
+  );
+
+  server.registerTool(
+    "update_member",
+    {
+      title: "Member ändern",
+      description:
+        "Ändert Name, Telefonnummer oder Team einer Person. Nur die mitgegebenen Felder werden angefasst. Soll die Person aus ihrem Team raus, team auf einen leeren Text setzen.",
+      inputSchema: {
+        actor: actorSchema,
+        name: z.string().min(1).max(100).describe("Aktueller Name der Person"),
+        newName: z.string().max(100).optional().describe("Neuer Name"),
+        phone: z
+          .string()
+          .max(30)
+          .optional()
+          .describe("Neue Telefonnummer. Leerer Text entfernt die vorhandene."),
+        team: z
+          .string()
+          .max(100)
+          .optional()
+          .describe("Neues Team. Leerer Text nimmt die Person aus ihrem Team."),
+      },
+    },
+    async ({ actor, name, newName, phone, team }) => {
+      const members = await prisma.member.findMany({
+        where: { name: { equals: name.trim(), mode: "insensitive" } },
+      });
+      if (members.length === 0) return text(`„${name}" ist nicht in der Orga.`);
+      if (members.length > 1) {
+        return text(
+          `Es gibt ${members.length} Personen namens „${name}". Das lässt sich hier nicht auseinanderhalten — bitte im Admin ändern.`
+        );
+      }
+      const member = members[0];
+
+      const changes: string[] = [];
+      const data: { name?: string; phone?: string | null; teamId?: string | null } = {};
+
+      if (newName?.trim() && newName.trim() !== member.name) {
+        const clash = await prisma.member.findFirst({
+          where: { name: { equals: newName.trim(), mode: "insensitive" } },
+        });
+        if (clash) return text(`„${clash.name}" gibt es schon. Name nicht geändert.`);
+        data.name = newName.trim();
+        changes.push(`heißt jetzt „${data.name}"`);
+      }
+
+      if (phone !== undefined) {
+        data.phone = phone.trim() || null;
+        changes.push(data.phone ? `Nummer ${data.phone}` : "Nummer entfernt");
+      }
+
+      if (team !== undefined) {
+        if (!team.trim()) {
+          data.teamId = null;
+          changes.push("aus dem Team genommen");
+        } else {
+          const wanted = team.trim();
+          const found = await prisma.team.findFirst({
+            where: { name: { equals: wanted, mode: "insensitive" } },
+          });
+          const target = found ?? (await prisma.team.create({ data: { name: wanted } }));
+          data.teamId = target.id;
+          changes.push(`Team ${target.name}${found ? "" : " (neu angelegt)"}`);
+        }
+      }
+
+      if (changes.length === 0) return text("Nichts angegeben, was zu ändern wäre.");
+
+      const updated = await prisma.member.update({ where: { id: member.id }, data });
+
+      await recordAudit({
+        source: "chat",
+        actor,
+        action: "member.update",
+        entity: "Member",
+        entityId: member.id,
+        summary: `„${member.name}": ${changes.join(", ")}`,
+      });
+
+      return text(`${updated.name}: ${changes.join(", ")}.`);
     }
   );
 

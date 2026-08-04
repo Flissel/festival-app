@@ -6,7 +6,7 @@ import { buildWhatsAppLink } from "@/lib/whatsapp";
 
 type TaskStatus = "open" | "in_progress" | "done";
 
-type MemberRef = { id: string; name: string; phone: string };
+type MemberRef = { id: string; name: string; phone: string | null };
 type TeamRef = { id: string; name: string; members: MemberRef[] };
 
 type Task = {
@@ -111,7 +111,9 @@ export function TaskCard({
         </select>
       </div>
 
-      {task.member && (
+      {/* Ohne Nummer gibt es nichts zu verlinken — dann lieber kein Knopf als
+          einer, der ins Leere führt. */}
+      {task.member?.phone && (
         <a
           href={buildWhatsAppLink(task.member.phone, messageFor(task.member.name, task))}
           target="_blank"
@@ -127,10 +129,12 @@ export function TaskCard({
           {assignedTeam.members.length === 0 && (
             <span className="text-xs text-white/40">Team hat noch keine Members.</span>
           )}
-          {assignedTeam.members.map((member) => (
+          {assignedTeam.members
+            .filter((member) => member.phone)
+            .map((member) => (
             <a
               key={member.id}
-              href={buildWhatsAppLink(member.phone, messageFor(member.name, task))}
+              href={buildWhatsAppLink(member.phone!, messageFor(member.name, task))}
               target="_blank"
               rel="noopener noreferrer"
               className="rounded-md bg-emerald-500/20 px-2 py-1 text-xs text-emerald-300 hover:bg-emerald-500/30"

@@ -110,8 +110,12 @@ Aufteilung: **OpenClaw hält den Telegram-Bot**, die App ist die Datenschicht.
 In der App steckt kein Telegram-Code; sie stellt nur Werkzeuge bereit.
 
 Was der Bot kann: Aufgaben auflisten, anlegen, ändern, zuweisen und löschen,
-Kategorien und Budget lesen, den Orga-Plan einspielen und den Änderungsverlauf
-zeigen.
+Members und Teams anlegen und ändern, Kategorien und Budget lesen, den
+Orga-Plan einspielen und den Änderungsverlauf zeigen.
+
+Die Telefonnummer eines Members ist freiwillig. Ohne sie lassen sich Aufgaben
+zuweisen, aber keine Einzelnachrichten schicken — der Broadcast nennt die
+Betroffenen dann namentlich, statt sie stillschweigend zu überspringen.
 
 Was er bewusst nicht kann:
 
@@ -119,6 +123,8 @@ Was er bewusst nicht kann:
   E-Mail-Adressen. Was einmal in einem Gruppenchat steht, ist nicht mehr
   einzufangen; die Liste mit Namen gibt es im Admin und als CSV.
 - **Keine Gäste anlegen, ändern oder löschen** und keine Zahlungen auslösen.
+- **Members und Teams nicht löschen.** Anlegen und ändern ja; wer aus der Orga
+  raus soll, wird im Admin entfernt.
 
 ### Zugriff und Nachvollziehbarkeit
 
