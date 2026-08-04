@@ -29,7 +29,9 @@ export async function sendChatMessage(params: {
 
   if (!gatewayUrl || !token) {
     logger.warn("openclaw.not_configured");
-    return { ok: false, error: "OpenClaw-Gateway ist nicht konfiguriert" };
+    // Steht so in der Fehlerliste des Broadcast-Formulars — deshalb ohne den
+    // Namen des Gateways, der für die Orga nichts bedeutet.
+    return { ok: false, error: "Nachrichtenversand ist nicht eingerichtet" };
   }
 
   const channel = params.channel ?? DEFAULT_CHANNEL;
