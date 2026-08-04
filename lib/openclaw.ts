@@ -5,6 +5,13 @@ import { logger } from "@/lib/logger";
 // erwartet, entscheidet die Installation, nicht dieser Code.
 export const DEFAULT_CHANNEL = process.env.OPENCLAW_CHANNEL ?? "telegram";
 
+// Einzelne Personen erreichen wir über ihre Telefonnummer, und die versteht
+// nur WhatsApp — Telegram kennt keine Nummern als Ziel, sondern nur Chat-IDs.
+// Beide Kanäle laufen im selben Gateway, deshalb ist das keine Entweder-oder-
+// Entscheidung: Die Gruppe bleibt bei DEFAULT_CHANNEL, Einzelnachrichten
+// nehmen diesen hier.
+export const PHONE_CHANNEL = process.env.OPENCLAW_PHONE_CHANNEL ?? "whatsapp";
+
 export type SendResult = { ok: true } | { ok: false; error: string };
 
 export function groupChatId(): string | null {
@@ -71,7 +78,11 @@ export async function sendChatMessage(params: {
 // Für die Zustellung an eine einzelne Person: Nummer auf Ziffern und Pluszeichen
 // reduzieren, alles andere verwirrt das Gateway.
 export async function sendToPhone(phone: string, message: string): Promise<SendResult> {
-  return sendChatMessage({ target: phone.replace(/[^\d+]/g, ""), message });
+  return sendChatMessage({
+    target: phone.replace(/[^\d+]/g, ""),
+    message,
+    channel: PHONE_CHANNEL,
+  });
 }
 
 // Eine Nachricht in die Orga-Gruppe statt an jede Person einzeln.

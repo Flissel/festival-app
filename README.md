@@ -81,7 +81,9 @@ Optional:
   überweisen
 - `OPENCLAW_GATEWAY_URL`/`OPENCLAW_GATEWAY_TOKEN` — ohne diese Werte geht keine
   Nachricht raus; der Broadcast weist im Admin darauf hin
-- `OPENCLAW_CHANNEL` — Kanalname für das Gateway, Standard `telegram`
+- `OPENCLAW_CHANNEL` — Kanal für Nachrichten an die Gruppe, Standard `telegram`
+- `OPENCLAW_PHONE_CHANNEL` — Kanal für Einzelnachrichten, Standard `whatsapp`;
+  Ziel ist dort eine Telefonnummer, die Telegram nicht als Ziel kennt
 - `TELEGRAM_GROUP_CHAT_ID` — Chat-ID der Orga-Gruppe; nur damit lässt sich eine
   Nachricht an die Gruppe statt einzeln an alle Members schicken
 - `MCP_SERVER_TOKEN` — ohne Token ist der MCP-Endpunkt deaktiviert
