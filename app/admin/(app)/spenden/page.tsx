@@ -1,5 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { donationConfig, formatIban, paypalMeLink } from "@/lib/donation";
+import { RecordPaymentForm } from "@/components/admin/RecordPaymentForm";
+import { DeletePaymentButton } from "@/components/admin/DeletePaymentButton";
 
 export const dynamic = "force-dynamic";
 
@@ -9,6 +11,11 @@ function formatEuro(amount: number): string {
 
 export default async function AdminDonationsPage() {
   const config = donationConfig();
+  const guests = await prisma.guest.findMany({
+    where: { waitlisted: false },
+    orderBy: { name: "asc" },
+    select: { id: true, name: true },
+  });
   const payments = await prisma.payment.findMany({
     orderBy: { createdAt: "desc" },
     take: 50,
@@ -80,8 +87,9 @@ export default async function AdminDonationsPage() {
         </p>
         <p className="mt-2">
           Deshalb ist die Liste unten reine Handarbeit: Du siehst den Eingang in
-          deinem PayPal-Konto und trägst ihn unter <em>Gäste</em> beim passenden
-          Namen ein. Genau so wie Bargeld, das jemand vor Ort in die Kasse legt.
+          deinem PayPal-Konto und trägst ihn hier ein. Genau so wie Bargeld, das
+          jemand vor Ort in die Kasse legt. Mehrere Beiträge derselben Person
+          sind kein Problem — jeder wird eine eigene Zeile.
         </p>
         <p className="mt-2">
           Der Hinweis auf der Einladungsseite bittet darum, &bdquo;An einen Freund&ldquo;
@@ -98,14 +106,20 @@ export default async function AdminDonationsPage() {
             ({completed.length}, {formatEuro(total)})
           </span>
         </h2>
+        <div className="mb-4 rounded-xl border border-white/10 bg-white/5 p-5">
+          <p className="mb-3 text-sm font-medium text-white">Beitrag eintragen</p>
+          <RecordPaymentForm guests={guests} />
+        </div>
+
         <div className="overflow-x-auto rounded-xl border border-white/10">
-          <table className="w-full min-w-[480px] text-sm">
+          <table className="w-full min-w-[560px] text-sm">
             <thead className="bg-white/5 text-left text-white/60">
               <tr>
                 <th className="px-4 py-2">Datum</th>
                 <th className="px-4 py-2">Gast</th>
                 <th className="px-4 py-2">Betrag</th>
                 <th className="px-4 py-2">Status</th>
+                <th className="px-4 py-2"></th>
               </tr>
             </thead>
             <tbody>
@@ -119,11 +133,18 @@ export default async function AdminDonationsPage() {
                   <td className="px-4 py-2">
                     {payment.status === "completed" ? "erhalten" : "offen"}
                   </td>
+                  <td className="px-4 py-2 text-right">
+                    <DeletePaymentButton
+                      paymentId={payment.id}
+                      guestName={payment.guest.name}
+                      amount={formatEuro(Number(payment.amount))}
+                    />
+                  </td>
                 </tr>
               ))}
               {payments.length === 0 && (
                 <tr>
-                  <td colSpan={4} className="px-4 py-6 text-center text-white/40">
+                  <td colSpan={5} className="px-4 py-6 text-center text-white/40">
                     Noch nichts eingetragen.
                   </td>
                 </tr>

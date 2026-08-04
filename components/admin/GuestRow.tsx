@@ -153,9 +153,10 @@ export function GuestRow({ guest }: { guest: Guest }) {
               Nachrücken
             </button>
           )}
-          {!guest.waitlisted && guest.paymentStatus !== "paid" && (
-            <MarkPaidForm guestId={guest.id} />
-          )}
+          {/* Auch nach dem ersten Eintrag sichtbar: Wer ein zweites Mal etwas
+              dazugibt, muss nachgetragen werden können, und ein Tippfehler
+              braucht eine zweite Zeile zum Geradebiegen. */}
+          {!guest.waitlisted && <MarkPaidForm guestId={guest.id} />}
           <button
             type="button"
             onClick={() => setEditing(true)}
