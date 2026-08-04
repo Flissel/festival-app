@@ -1,23 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { recordAudit } from "@/lib/audit";
-import { storeTaskImage, removeTaskImage, isStorageConfigured } from "@/lib/taskImage";
+import {
+  storeTaskImage,
+  removeTaskImage,
+  isStorageConfigured,
+  isUploadAuthorized,
+} from "@/lib/taskImage";
 import { logger } from "@/lib/logger";
 
 // Ein Foto lässt sich nicht durch ein MCP-Werkzeug schicken: Die Werkzeuge
 // tauschen Text aus, und ein Bild als Base64 sprengt sowohl das Kontextfenster
 // des Modells als auch das Größenlimit einer Serverless-Anfrage. Der Bot lädt
-// die Datei deshalb direkt hier hoch — mit demselben Token, mit dem er auch
-// die MCP-Werkzeuge aufruft.
-
-function isAuthorized(request: NextRequest): boolean {
-  const token = process.env.MCP_SERVER_TOKEN;
-  if (!token) return false;
-  return request.headers.get("authorization") === `Bearer ${token}`;
-}
+// die Datei deshalb direkt hier hoch — mit einem Token, der nur das darf und
+// nicht die übrigen Werkzeuge öffnet (siehe isUploadAuthorized).
 
 export async function POST(request: NextRequest) {
-  if (!isAuthorized(request)) {
+  if (!isUploadAuthorized(request.headers.get("authorization"))) {
     logger.warn("mcp.task_image.unauthorized");
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
