@@ -29,6 +29,8 @@ async function findMemberByPhone(phone: string) {
 type TaskWithRelations = {
   id: string;
   title: string;
+  description?: string | null;
+  imageUrl?: string | null;
   status: string;
   dueDate: Date | null;
   estimatedCost: unknown;
@@ -49,7 +51,12 @@ function formatTask(task: TaskWithRelations): string {
   else if (task.team) parts.push(`Team ${task.team.name}`);
   if (task.estimatedCost !== null) parts.push(`geplant ${Number(task.estimatedCost).toFixed(2)} €`);
   if (task.actualCost !== null) parts.push(`ausgegeben ${Number(task.actualCost).toFixed(2)} €`);
-  return "- " + parts.join(" · ");
+  if (task.imageUrl) parts.push("mit Foto");
+  const head = "- " + parts.join(" · ");
+  // Die Beschreibung kommt auf eine eigene Zeile: In der Kopfzeile stehen die
+  // Merkmale, mit denen man filtert und entscheidet. Ein Fließtext dazwischen
+  // macht eine Liste aus zwanzig Aufgaben unlesbar.
+  return task.description ? `${head}\n    ${task.description}` : head;
 }
 
 // Wer eine Änderung ausgelöst hat, meldet OpenClaw mit. Das ist ein Protokoll,
@@ -341,6 +348,14 @@ export function createMcpServer() {
         actor: actorSchema,
         title: z.string().trim().min(1).max(200),
         category: z.string().trim().min(1).max(100).describe("Name der Kategorie"),
+        description: z
+          .string()
+          .trim()
+          .max(2000)
+          .optional()
+          .describe(
+            "Was zur Aufgabe sonst noch wichtig ist — Maße, Ansprechpartner, Fundort. Der Titel bleibt kurz."
+          ),
         dueDate: z
           .string()
           .regex(/^\d{4}-\d{2}-\d{2}$/)
@@ -350,7 +365,7 @@ export function createMcpServer() {
         assignTo: z.string().optional().describe("Name eines Members oder Teams"),
       },
     },
-    async ({ actor, title, category, dueDate, estimatedCost, assignTo }) => {
+    async ({ actor, title, category, description, dueDate, estimatedCost, assignTo }) => {
       let categoryRecord = await prisma.budgetCategory.findFirst({
         where: { name: { equals: category, mode: "insensitive" } },
       });
@@ -379,6 +394,7 @@ export function createMcpServer() {
           data: {
             categoryId: categoryRecord.id,
             title,
+            description: description || null,
             dueDate: parseDueDate(dueDate),
             estimatedCost: estimatedCost ?? null,
             memberId: assignment?.memberId ?? null,
@@ -421,6 +437,12 @@ export function createMcpServer() {
         actor: actorSchema,
         taskId: z.string().describe("ID aus list_tasks"),
         status: z.enum(["open", "in_progress", "done"]).optional(),
+        description: z
+          .string()
+          .trim()
+          .max(2000)
+          .optional()
+          .describe("Neue Beschreibung. Leerer Text entfernt die vorhandene."),
         dueDate: z
           .string()
           .regex(/^\d{4}-\d{2}-\d{2}$/)
@@ -436,6 +458,7 @@ export function createMcpServer() {
       actor,
       taskId,
       status,
+      description,
       dueDate,
       clearDueDate,
       estimatedCost,
@@ -454,6 +477,9 @@ export function createMcpServer() {
       if (status !== undefined && status !== task.status) {
         changes.push(`Status → ${statusLabels[status]}`);
       }
+      if (description !== undefined) {
+        changes.push(description ? "Beschreibung geändert" : "Beschreibung entfernt");
+      }
       if (clearDueDate) changes.push("Fälligkeit entfernt");
       else if (dueDate !== undefined) changes.push(`fällig → ${dueDate}`);
       if (estimatedCost !== undefined) changes.push(`geplant → ${estimatedCost.toFixed(2)} €`);
@@ -466,6 +492,7 @@ export function createMcpServer() {
         where: { id: taskId },
         data: {
           ...(status !== undefined ? { status } : {}),
+          ...(description !== undefined ? { description: description || null } : {}),
           ...(clearDueDate
             ? { dueDate: null }
             : dueDate !== undefined

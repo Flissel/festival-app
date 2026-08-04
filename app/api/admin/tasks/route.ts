@@ -9,6 +9,7 @@ import { isUniqueViolation } from "@/lib/prismaError";
 const bodySchema = z.object({
   categoryId: z.string().min(1),
   title: z.string().trim().min(1).max(200),
+  description: z.string().trim().max(2000).optional().or(z.literal("")),
   memberId: z.string().trim().max(100).optional().or(z.literal("")),
   teamId: z.string().trim().max(100).optional().or(z.literal("")),
   estimatedCost: z.coerce.number().nonnegative().max(1000000).optional().or(z.literal("")),
@@ -26,7 +27,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Ungültige Eingabe" }, { status: 400 });
   }
 
-  const { categoryId, title, memberId, teamId, estimatedCost, dueDate } = parsed.data;
+  const { categoryId, title, description, memberId, teamId, estimatedCost, dueDate } = parsed.data;
 
   const category = await prisma.budgetCategory.findUnique({ where: { id: categoryId } });
   if (!category) {
@@ -53,6 +54,7 @@ export async function POST(request: NextRequest) {
       data: {
         categoryId,
         title,
+        description: description || null,
         memberId: memberId || null,
         teamId: teamId || null,
         estimatedCost: estimatedCost === "" || estimatedCost === undefined ? null : estimatedCost,

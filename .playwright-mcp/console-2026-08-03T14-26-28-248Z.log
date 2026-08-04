@@ -1,0 +1,37 @@
+[    4209ms] [INFO] This page uses Chrome's Built-In AI features (LanguageDetector)! We're always improving our models; please submit your feedback here: https://issues.chromium.org/issues/new?component=1583316 @ https://web.telegram.org/a/assets/useConnectionStatus-BgIkVQjt.js:2
+[ 2468192ms] [WARNING] The provided application server key is not a VAPID key. Only VAPID keys will be supported in the future. For more information check https://crbug.com/41468162. @ https://web.telegram.org/a/#93372553:0
+[27718204ms] [ERROR] Socket zws2.web.telegram.org closed. Code: 1006, reason: , was clean: false @ https://web.telegram.org/a/worker-CmQmQVY1.js:2135
+[27718250ms] [LOG] %c[2026-08-03T22:08:26.453Z] [WARN] - [Connection closed while receiving data] color : #ff00ff @ https://web.telegram.org/a/worker-CmQmQVY1.js:2135
+[27718250ms] [ERROR] Error: Not connected
+    at Kr.recv (https://web.telegram.org/a/worker-CmQmQVY1.js:2136:29646)
+    at async e._recvLoop (https://web.telegram.org/a/worker-CmQmQVY1.js:2136:55864) @ https://web.telegram.org/a/worker-CmQmQVY1.js:2135
+[27726014ms] [ERROR] Socket zws2.web.telegram.org closed. Code: 1006, reason: , was clean: false @ https://web.telegram.org/a/worker-CmQmQVY1.js:2135
+[27726014ms] [LOG] %c[2026-08-03T22:08:34.261Z] [WARN] - [Connection closed while receiving data] color : #ff00ff @ https://web.telegram.org/a/worker-CmQmQVY1.js:2135
+[27726014ms] [ERROR] Error: Not connected
+    at Kr.recv (https://web.telegram.org/a/worker-CmQmQVY1.js:2136:29646)
+    at async e._recvLoop (https://web.telegram.org/a/worker-CmQmQVY1.js:2136:55864) @ https://web.telegram.org/a/worker-CmQmQVY1.js:2135
+[27729254ms] [ERROR] WebSocket error Event @ https://web.telegram.org/a/worker-CmQmQVY1.js:2135
+[27729254ms] [LOG] %c[2026-08-03T22:08:37.502Z] [ERROR] - [WebSocket connection failed attempt: 1] color : #ff0000 @ https://web.telegram.org/a/worker-CmQmQVY1.js:2135
+[27729254ms] [ERROR] Event @ https://web.telegram.org/a/worker-CmQmQVY1.js:2135
+[27729255ms] [ERROR] Socket zws2.web.telegram.org closed. Code: 1006, reason: , was clean: false @ https://web.telegram.org/a/worker-CmQmQVY1.js:2135
+[27730269ms] [LOG] %c[2026-08-03T22:08:38.517Z] [WARN] - [Using fallback connection] color : #ff00ff @ https://web.telegram.org/a/worker-CmQmQVY1.js:2135
+[27733772ms] [LOG] %c[2026-08-03T22:08:42.019Z] [WARN] - [Connection closed while receiving data] color : #ff00ff @ https://web.telegram.org/a/worker-CmQmQVY1.js:2135
+[27733772ms] [ERROR] undefined @ https://web.telegram.org/a/worker-CmQmQVY1.js:2135
+[28410891ms] [WARNING] Error: TIMEOUT
+    at https://web.telegram.org/a/worker-CmQmQVY1.js:2136:130002
+    at async ls (https://web.telegram.org/a/worker-CmQmQVY1.js:2136:130099)
+    at async e._updateLoop (https://web.telegram.org/a/worker-CmQmQVY1.js:2136:116262) @ https://web.telegram.org/a/worker-CmQmQVY1.js:2135
+[28411900ms] [LOG] %c[2026-08-03T22:20:00.147Z] [WARN] - [Connection closed while receiving data] color : #ff00ff @ https://web.telegram.org/a/worker-CmQmQVY1.js:2135
+[28411900ms] [ERROR] Error: Not connected
+    at Kr.recv (https://web.telegram.org/a/worker-CmQmQVY1.js:2136:29646)
+    at async e._recvLoop (https://web.telegram.org/a/worker-CmQmQVY1.js:2136:55864) @ https://web.telegram.org/a/worker-CmQmQVY1.js:2135
+[28414914ms] [ERROR] Socket zws2.web.telegram.org closed. Code: 1006, reason: , was clean: false @ https://web.telegram.org/a/worker-CmQmQVY1.js:2135
+[30906508ms] [WARNING] Error: TIMEOUT
+    at https://web.telegram.org/a/worker-CmQmQVY1.js:2136:130002
+    at async ls (https://web.telegram.org/a/worker-CmQmQVY1.js:2136:130099)
+    at async e._updateLoop (https://web.telegram.org/a/worker-CmQmQVY1.js:2136:116262) @ https://web.telegram.org/a/worker-CmQmQVY1.js:2135
+[30907514ms] [LOG] %c[2026-08-03T23:01:35.761Z] [WARN] - [Connection closed while receiving data] color : #ff00ff @ https://web.telegram.org/a/worker-CmQmQVY1.js:2135
+[30907514ms] [ERROR] Error: Not connected
+    at Kr.recv (https://web.telegram.org/a/worker-CmQmQVY1.js:2136:29646)
+    at async e._recvLoop (https://web.telegram.org/a/worker-CmQmQVY1.js:2136:55864) @ https://web.telegram.org/a/worker-CmQmQVY1.js:2135
+[30910461ms] [ERROR] Socket zws2.web.telegram.org closed. Code: 1006, reason: , was clean: false @ https://web.telegram.org/a/worker-CmQmQVY1.js:2135

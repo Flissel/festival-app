@@ -1,0 +1,10 @@
+- generic [active] [ref=f1e1]:
+  - main [ref=f1e2]:
+    - generic [ref=f1e3]:
+      - heading "Admin-Login" [level=1] [ref=f1e4]
+      - generic [ref=f1e5]:
+        - generic [ref=f1e6]: Passwort
+        - textbox "Passwort" [ref=f1e7]: NwQZt29nNvxpfTxRcWPs
+      - paragraph [ref=f1e10]: Admin-Login ist nicht konfiguriert
+      - button "Anmelden" [ref=f1e8]
+  - alert [ref=f1e9]

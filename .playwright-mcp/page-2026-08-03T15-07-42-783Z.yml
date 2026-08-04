@@ -1,0 +1,135 @@
+- generic [ref=f2e1]:
+  - generic:
+    - generic:       
+    - generic:     
+    - generic:       
+  - generic [ref=f2e7]:
+    - generic [ref=f2e9]:
+      - text:                    
+      - generic [ref=f2e1585]:
+        - text:                                 
+        - generic [ref=f2e2226]:
+          - generic [ref=f2e2227]:
+            - button "Return to member selection" [ref=f2e2228] [cursor=pointer]:
+              - generic [ref=f2e2229]: 
+            - heading "New Group" [level=3] [ref=f2e2230]
+          - generic [ref=f2e2231]:
+            - button "Set Profile Photo" [ref=f2e2233] [cursor=pointer]:
+              - generic [ref=f2e2234]: 
+            - generic [ref=f2e2235]:
+              - textbox "Group name" [active] [ref=f2e2236]: Festival Orga
+              - generic: Group name
+            - heading "1 member" [level=3] [ref=f2e2237]
+            - generic [ref=f2e2238]:
+              - generic:
+                - button "Festival Orga Festival Orga bot":
+                  - generic:
+                    - generic "Festival Orga": FO
+                    - generic:
+                      - generic:
+                        - button "Festival Orga"
+                      - generic: bot
+          - button "Create Group" [ref=f2e2239] [cursor=pointer]:
+            - generic [ref=f2e2240]: 
+    - generic [ref=f2e506]:
+      - generic [ref=f2e931]:
+        - generic [ref=f2e932]:
+          - generic [ref=f2e2243] [cursor=pointer]:
+            - generic "Festival Orga" [ref=f2e2244]: F
+            - generic [ref=f2e2247]:
+              - button "Festival Orga" [ref=f2e2249]
+              - generic [ref=f2e2250]: 2 members
+          - generic [ref=f2e948]:
+            - button "Search this chat" [ref=f2e949] [cursor=pointer]:
+              - generic [ref=f2e950]: 
+            - button "More actions" [ref=f2e951] [cursor=pointer]:
+              - generic [ref=f2e952]: 
+        - generic [ref=f2e954]:
+          - generic [ref=f2e2254]:
+            - heading "You created a group" [level=3] [ref=f2e2255]
+            - paragraph [ref=f2e2256]: "Groups can have:"
+            - list [ref=f2e2257]:
+              - listitem [ref=f2e2258]: ✓Up to 200,000 members
+              - listitem [ref=f2e2259]: ✓Persistent chat history
+              - listitem [ref=f2e2260]: ✓Public links such as t.me/title
+              - listitem [ref=f2e2261]: ✓Admins with different rights
+          - generic [ref=f2e1300]:
+            - generic:
+              - generic:
+                - button "AccDescrPollVoteDown":
+                  - generic: 
+                - generic: 
+              - generic:
+                - button "Go to next unread reactions":
+                  - generic: 
+                - generic: 
+              - generic:
+                - button "Go to next mention":
+                  - generic: 
+                - generic: 
+              - generic:
+                - button "Go to bottom":
+                  - generic: 
+            - generic [ref=f2e1301]:
+              - generic [ref=f2e1303]:
+                - generic [ref=f2e1307]:
+                  - button "Add an attachment" [ref=f2e1308] [cursor=pointer]:
+                    - generic [ref=f2e1309]: 
+                  - menu "Add an attachment":      
+                - generic:
+                  - button:
+                    - generic: 
+                  - button [disabled]:
+                    - generic: 
+                - button "Open full editor":
+                  - generic: 
+                - generic [ref=f2e1310]:
+                  - generic [ref=f2e1313]:
+                    - textbox "Message" [ref=f2e1314]:
+                      - paragraph [ref=f2e1315]
+                    - generic: Message
+                  - generic:
+                    - generic:
+                      - generic:
+                        - paragraph
+                  - generic:
+                    - generic:
+                      - button [disabled]:
+                        - generic: 
+                    - generic:
+                      - button [disabled]:
+                        - generic: 
+                    - button [disabled]:
+                      - generic: 
+                    - button [disabled]:
+                      - generic: 
+                    - button [disabled]:
+                      - generic: 
+                    - button [disabled]:
+                      - generic: 
+                - text:     
+                - button "Choose emoji, sticker or GIF" [ref=f2e1316] [cursor=pointer]:
+                  - generic [ref=f2e1317]: 
+              - button "Record voice message" [ref=f2e1318] [cursor=pointer]:
+                - generic [ref=f2e1319]: 
+                - generic [ref=f2e1320]: 
+                - text: 
+                - generic [ref=f2e1321]: 
+                - generic [ref=f2e1322]: 
+              - generic:  
+              - generic:  
+            - generic:
+              - generic:
+                - generic "0 messages selected"
+      - generic [ref=f2e1363]:
+        - generic "Festival Orga" [ref=f2e2262]: F
+        - generic [ref=f2e1367]:
+          - generic [ref=f2e1368]: 
+          - textbox "Search" [ref=f2e1371]
+          - button [ref=f2e1374] [cursor=pointer]:
+            - generic [ref=f2e1375]: 
+        - generic [ref=f2e1376]:
+          - button "FilterByUser" [ref=f2e2264] [cursor=pointer]:
+            - generic [ref=f2e2265]: 
+          - button "Jump to Date" [ref=f2e1377] [cursor=pointer]:
+            - generic [ref=f2e1378]: 

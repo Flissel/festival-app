@@ -111,6 +111,13 @@ model Task {
   category       BudgetCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   categoryId     String
   title          String
+  // Der Titel ist die Kennung und bleibt kurz. Was jemand sonst noch wissen
+  // muss — Maße, Ansprechpartner, wo das Zeug steht — gehört hierher, damit
+  // der Titel nicht zum Absatz wird.
+  description    String?
+  // Ein Foto sagt bei „welcher Anhänger?" mehr als drei Sätze. Liegt im Blob-
+  // Speicher, hier steht nur die URL.
+  imageUrl       String?
   status         TaskStatus     @default(open)
   member         Member?        @relation(fields: [memberId], references: [id], onDelete: SetNull)
   memberId       String?

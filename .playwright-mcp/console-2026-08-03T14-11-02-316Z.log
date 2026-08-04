@@ -1,0 +1,2 @@
+[     798ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "new-password"): (More info: https://goo.gl/9p2vKq) %o @ https://festival-app-two-delta.vercel.app/admin/login:0
+[   19330ms] [ERROR] Failed to load resource: the server responded with a status of 500 () @ https://festival-app-two-delta.vercel.app/api/admin/login:0

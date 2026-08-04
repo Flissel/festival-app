@@ -1,0 +1,690 @@
+- generic [active] [ref=f2e1]:
+  - generic:
+    - generic:       
+    - generic:     
+    - generic:       
+  - generic [ref=f2e7]:
+    - generic [ref=f2e9]:
+      - text:                     
+      - generic [ref=f2e1586]:
+        - generic [ref=f2e1587]:
+          - button "Return to Chat List" [ref=f2e1588] [cursor=pointer]:
+            - generic [ref=f2e1589]: 
+          - heading "Add Members" [level=3] [ref=f2e1590]
+        - generic [ref=f2e1591]:
+          - generic [ref=f2e1592]:
+            - generic [ref=f2e1593]:
+              - generic [ref=f2e1915] [cursor=pointer]:
+                - generic "Festival Orga" [ref=f2e1916]: FO
+                - button "Festival Orga" [ref=f2e1921]
+                - generic [ref=f2e1922]: 
+              - textbox "Who would you like to add?" [ref=f2e1925]
+            - generic [ref=f2e1904]:
+              - button " Katha Katha last seen today at 09:55" [ref=f2e1926] [cursor=pointer]:
+                - generic:
+                  - generic:
+                    - checkbox "" [ref=f2e1927]
+                    - generic: 
+                - generic "Katha" [ref=f2e1929]: K
+                - button "Katha" [ref=f2e1934]
+                - generic [ref=f2e1935]: last seen today at 09:55
+              - button " Andrea Volleyball Andrea Volleyball last seen 7/24/2026" [ref=f2e1936] [cursor=pointer]:
+                - generic:
+                  - generic:
+                    - checkbox "" [ref=f2e1937]
+                    - generic: 
+                - generic "Andrea Volleyball" [ref=f2e1939]: AV
+                - button "Andrea Volleyball" [ref=f2e1944]
+                - generic [ref=f2e1945]: last seen 7/24/2026
+              - button " susi1 susi1 last seen 7/19/2026" [ref=f2e1946] [cursor=pointer]:
+                - generic:
+                  - generic:
+                    - checkbox "" [ref=f2e1947]
+                    - generic: 
+                - generic "susi1" [ref=f2e1949]: S
+                - button "susi1" [ref=f2e1954]
+                - generic [ref=f2e1955]: last seen 7/19/2026
+              - button " Alina Mentor Alina Mentor last seen 7/14/2026" [ref=f2e1956] [cursor=pointer]:
+                - generic:
+                  - generic:
+                    - checkbox "" [ref=f2e1957]
+                    - generic: 
+                - img "Alina Mentor" [ref=f2e1961]
+                - button "Alina Mentor" [ref=f2e1964]
+                - generic [ref=f2e1965]: last seen 7/14/2026
+              - button " Natalie Uni Natalie Uni last seen within a month" [ref=f2e1966] [cursor=pointer]:
+                - generic:
+                  - generic:
+                    - checkbox "" [ref=f2e1967]
+                    - generic: 
+                - generic "Natalie Uni" [ref=f2e1969]: NU
+                - button "Natalie Uni" [ref=f2e1974]
+                - generic [ref=f2e1975]: last seen within a month
+              - button " Michi Mentor Michi Mentor last seen within a week" [ref=f2e1976] [cursor=pointer]:
+                - generic:
+                  - generic:
+                    - checkbox "" [ref=f2e1977]
+                    - generic: 
+                - generic "Michi Mentor" [ref=f2e1979]: MM
+                - button "Michi Mentor" [ref=f2e1984]
+                - generic [ref=f2e1985]: last seen within a week
+              - button " Alexander Blinzler Alexander Blinzler last seen 7/3/2026" [ref=f2e1986] [cursor=pointer]:
+                - generic:
+                  - generic:
+                    - checkbox "" [ref=f2e1987]
+                    - generic: 
+                - img "Alexander Blinzler" [ref=f2e1991]
+                - button "Alexander Blinzler" [ref=f2e1994]
+                - generic [ref=f2e1995]: last seen 7/3/2026
+              - button " Lucy Lucy last seen today at 10:02" [ref=f2e1996] [cursor=pointer]:
+                - generic:
+                  - generic:
+                    - checkbox "" [ref=f2e1997]
+                    - generic: 
+                - generic "Lucy" [ref=f2e1999]: L
+                - button "Lucy" [ref=f2e2004]
+                - generic [ref=f2e2005]: last seen today at 10:02
+              - button " Nadine Nadine last seen within a week" [ref=f2e2006] [cursor=pointer]:
+                - generic:
+                  - generic:
+                    - checkbox "" [ref=f2e2007]
+                    - generic: 
+                - generic "Nadine" [ref=f2e2009]: "N"
+                - button "Nadine" [ref=f2e2014]
+                - generic [ref=f2e2015]: last seen within a week
+              - button " anna Yogamama anna Yogamama last seen within a week" [ref=f2e2016] [cursor=pointer]:
+                - generic:
+                  - generic:
+                    - checkbox "" [ref=f2e2017]
+                    - generic: 
+                - img "anna Yogamama" [ref=f2e2021]
+                - button "anna Yogamama" [ref=f2e2024]
+                - generic [ref=f2e2025]: last seen within a week
+              - button " Bromi Bromi last seen recently" [ref=f2e2026] [cursor=pointer]:
+                - generic:
+                  - generic:
+                    - checkbox "" [ref=f2e2027]
+                    - generic: 
+                - img "Bromi" [ref=f2e2031]
+                - button "Bromi" [ref=f2e2034]
+                - generic [ref=f2e2035]: last seen recently
+              - button " Christopher Bennett Christopher Bennett last seen 6/16/2026" [ref=f2e2036] [cursor=pointer]:
+                - generic:
+                  - generic:
+                    - checkbox "" [ref=f2e2037]
+                    - generic: 
+                - generic "Christopher Bennett" [ref=f2e2039]: CB
+                - button "Christopher Bennett" [ref=f2e2044]
+                - generic [ref=f2e2045]: last seen 6/16/2026
+              - button " Selina Selina last seen 7/24/2026" [ref=f2e2046] [cursor=pointer]:
+                - generic:
+                  - generic:
+                    - checkbox "" [ref=f2e2047]
+                    - generic: 
+                - generic "Selina" [ref=f2e2049]: S
+                - button "Selina" [ref=f2e2054]
+                - generic [ref=f2e2055]: last seen 7/24/2026
+              - button " Airline Midsommar Airline Midsommar last seen 7/29/2026" [ref=f2e2056] [cursor=pointer]:
+                - generic:
+                  - generic:
+                    - checkbox "" [ref=f2e2057]
+                    - generic: 
+                - generic "Airline Midsommar" [ref=f2e2059]: AM
+                - button "Airline Midsommar" [ref=f2e2064]
+                - generic [ref=f2e2065]: last seen 7/29/2026
+              - button " West Wimmer West Wimmer last seen 1 minute ago" [ref=f2e2066] [cursor=pointer]:
+                - generic:
+                  - generic:
+                    - checkbox "" [ref=f2e2067]
+                    - generic: 
+                - generic "West Wimmer" [ref=f2e2069]: WW
+                - button "West Wimmer" [ref=f2e2074]
+                - generic [ref=f2e2075]: last seen 1 minute ago
+              - button " Bond Bond last seen 7/14/2026" [ref=f2e2076] [cursor=pointer]:
+                - generic:
+                  - generic:
+                    - checkbox "" [ref=f2e2077]
+                    - generic: 
+                - generic "Bond" [ref=f2e2079]: B
+                - button "Bond" [ref=f2e2084]
+                - generic [ref=f2e2085]: last seen 7/14/2026
+              - button " Giesinger~Apotheke Giesinger~Apotheke last seen a long time ago" [ref=f2e2086] [cursor=pointer]:
+                - generic:
+                  - generic:
+                    - checkbox "" [ref=f2e2087]
+                    - generic: 
+                - img "Giesinger~Apotheke" [ref=f2e2091]
+                - button "Giesinger~Apotheke" [ref=f2e2094]
+                - generic [ref=f2e2095]: last seen a long time ago
+              - button " Alex Göpfi Alex Göpfi last seen 10/20/2025" [ref=f2e2096] [cursor=pointer]:
+                - generic:
+                  - generic:
+                    - checkbox "" [ref=f2e2097]
+                    - generic: 
+                - generic "Alex Göpfi" [ref=f2e2099]: AG
+                - button "Alex Göpfi" [ref=f2e2104]
+                - generic [ref=f2e2105]: last seen 10/20/2025
+              - button " susi10 susi10 last seen 7/27/2026" [ref=f2e2106] [cursor=pointer]:
+                - generic:
+                  - generic:
+                    - checkbox "" [ref=f2e2107]
+                    - generic: 
+                - generic "susi10" [ref=f2e2109]: S
+                - button "susi10" [ref=f2e2114]
+                - generic [ref=f2e2115]: last seen 7/27/2026
+              - button " Tanja Tanja last seen 7/29/2026" [ref=f2e2116] [cursor=pointer]:
+                - generic:
+                  - generic:
+                    - checkbox "" [ref=f2e2117]
+                    - generic: 
+                - generic "Tanja" [ref=f2e2119]: T
+                - button "Tanja" [ref=f2e2124]
+                - generic [ref=f2e2125]: last seen 7/29/2026
+              - button " Arthit Arthit last seen 10/5/2025" [ref=f2e2126] [cursor=pointer]:
+                - generic:
+                  - generic:
+                    - checkbox "" [ref=f2e2127]
+                    - generic: 
+                - generic "Arthit" [ref=f2e2129]: A
+                - button "Arthit" [ref=f2e2134]
+                - generic [ref=f2e2135]: last seen 10/5/2025
+              - button " Chrissi Gunnes Chrissi Gunnes last seen 12/19/2025" [ref=f2e2136] [cursor=pointer]:
+                - generic:
+                  - generic:
+                    - checkbox "" [ref=f2e2137]
+                    - generic: 
+                - generic "Chrissi Gunnes" [ref=f2e2139]: CG
+                - button "Chrissi Gunnes" [ref=f2e2144]
+                - generic [ref=f2e2145]: last seen 12/19/2025
+              - button " Miri Schmieri Miri Schmieri last seen 7/7/2025" [ref=f2e2146] [cursor=pointer]:
+                - generic:
+                  - generic:
+                    - checkbox "" [ref=f2e2147]
+                    - generic: 
+                - img "Miri Schmieri" [ref=f2e2151]
+                - button "Miri Schmieri" [ref=f2e2154]
+                - generic [ref=f2e2155]: last seen 7/7/2025
+              - button " Gehirn tu Moritz Brautmann Gehirn tu Moritz Brautmann last seen 5/17/2026" [ref=f2e2156] [cursor=pointer]:
+                - generic:
+                  - generic:
+                    - checkbox "" [ref=f2e2157]
+                    - generic: 
+                - img "Gehirn tu Moritz Brautmann" [ref=f2e2161]
+                - button "Gehirn tu Moritz Brautmann" [ref=f2e2164]
+                - generic [ref=f2e2165]: last seen 5/17/2026
+              - button " Tomasso Segnana Segn Tomasso Segnana Segn last seen 7/28/2026" [ref=f2e2166] [cursor=pointer]:
+                - generic:
+                  - generic:
+                    - checkbox "" [ref=f2e2167]
+                    - generic: 
+                - generic "Tomasso Segnana Segn" [ref=f2e2169]: TS
+                - button "Tomasso Segnana Segn" [ref=f2e2174]
+                - generic [ref=f2e2175]: last seen 7/28/2026
+              - button " Tim Engeßer Tim Engeßer last seen 7/16/2026" [ref=f2e2176] [cursor=pointer]:
+                - generic:
+                  - generic:
+                    - checkbox "" [ref=f2e2177]
+                    - generic: 
+                - generic "Tim Engeßer" [ref=f2e2179]: TE
+                - button "Tim Engeßer" [ref=f2e2184]
+                - generic [ref=f2e2185]: last seen 7/16/2026
+              - button " Olivenholz Olivenholz last seen 5/17/2026" [ref=f2e2186] [cursor=pointer]:
+                - generic:
+                  - generic:
+                    - checkbox "" [ref=f2e2187]
+                    - generic: 
+                - img "Olivenholz" [ref=f2e2191]
+                - button "Olivenholz" [ref=f2e2194]
+                - generic [ref=f2e2195]: last seen 5/17/2026
+              - button " kathi henk kathi henk last seen 4/21/2026" [ref=f2e2196] [cursor=pointer]:
+                - generic:
+                  - generic:
+                    - checkbox "" [ref=f2e2197]
+                    - generic: 
+                - generic "kathi henk" [ref=f2e2199]: KH
+                - button "kathi henk" [ref=f2e2204]
+                - generic [ref=f2e2205]: last seen 4/21/2026
+              - button " Domi Domi last seen within a month" [ref=f2e2206] [cursor=pointer]:
+                - generic:
+                  - generic:
+                    - checkbox "" [ref=f2e2207]
+                    - generic: 
+                - generic "Domi" [ref=f2e2209]: D
+                - button "Domi" [ref=f2e2214]
+                - generic [ref=f2e2215]: last seen within a month
+              - button " Roniboy Roniboy last seen 4/25/2026" [ref=f2e2216] [cursor=pointer]:
+                - generic:
+                  - generic:
+                    - checkbox "" [ref=f2e2217]
+                    - generic: 
+                - generic "Roniboy" [ref=f2e2219]: R
+                - button "Roniboy" [ref=f2e2224]
+                - generic [ref=f2e2225]: last seen 4/25/2026
+          - button "Continue To Group Info" [ref=f2e1897] [cursor=pointer]:
+            - generic [ref=f2e1898]: 
+    - generic [ref=f2e506]:
+      - generic [ref=f2e931]:
+        - generic [ref=f2e932]:
+          - generic [ref=f2e936] [cursor=pointer]:
+            - img "BotFather" [ref=f2e939]
+            - generic [ref=f2e940]:
+              - button "BotFather" [ref=f2e942]
+              - generic [ref=f2e946]: 7 835 688 monthly users
+          - generic [ref=f2e948]:
+            - button "Search this chat" [ref=f2e949] [cursor=pointer]:
+              - generic [ref=f2e950]: 
+            - button "More actions" [ref=f2e951] [cursor=pointer]:
+              - generic [ref=f2e952]: 
+        - generic [ref=f2e954]:
+          - generic [ref=f2e957]:
+            - generic [ref=f2e960]:
+              - paragraph [ref=f2e961]: What can this bot do?
+              - text: "BotFather is the one bot to rule them all. Use it to create new bot accounts and manage your existing bots.About Telegram bots:"
+              - link "https://core.telegram.org/bots" [ref=f2e962] [cursor=pointer]:
+                - /url: https://core.telegram.org/bots
+              - text: "Bot API manual:"
+              - link "https://core.telegram.org/bots/api" [ref=f2e963] [cursor=pointer]:
+                - /url: https://core.telegram.org/bots/api
+              - text: Contact @BotSupport if you have questions about the Bot API.
+            - generic [ref=f2e964]:
+              - generic: March 29
+              - generic [ref=f2e968]:
+                - generic [ref=f2e970]:
+                  - text: /start
+                  - generic [ref=f2e971] [cursor=pointer]:
+                    - generic [ref=f2e972]: 17:37
+                    - generic [ref=f2e973]: 
+                - img "Red Heart" [ref=f2e983] [cursor=pointer]
+              - generic [ref=f2e986]:
+                - generic [ref=f2e988]:
+                  - text: I can help you create and manage Telegram bots. If you're new to the Bot API, please
+                  - link "see the manual" [ref=f2e989] [cursor=pointer]:
+                    - /url: https://core.telegram.org/bots
+                  - text: .You can control me by sending these commands:/newbot - create a new bot/mybots - edit your bots
+                  - strong [ref=f2e990]: Edit Bots
+                  - text: /setname - change a bot's name/setdescription - change bot description/setabouttext - change bot about info/setuserpic - change bot profile photo/setcommands - change the list of commands/deletebot - delete a bot
+                  - strong [ref=f2e991]: Bot Settings
+                  - text: /token - get authorization token/revoke - revoke bot access token/setinline - toggle
+                  - link "inline mode" [ref=f2e992] [cursor=pointer]:
+                    - /url: https://core.telegram.org/bots/inline
+                  - text: /setinlinegeo - toggle inline
+                  - link "location requests" [ref=f2e993] [cursor=pointer]:
+                    - /url: https://core.telegram.org/bots/inline#location-based-results
+                  - text: /setinlinefeedback - change
+                  - link "inline feedback" [ref=f2e994] [cursor=pointer]:
+                    - /url: https://core.telegram.org/bots/inline#collecting-feedback
+                  - text: settings/setjoingroups - can your bot be added to groups?/setprivacy - toggle
+                  - link "privacy mode" [ref=f2e995] [cursor=pointer]:
+                    - /url: https://core.telegram.org/bots/features#privacy-mode
+                  - text: in groups
+                  - strong [ref=f2e996]: Web Apps
+                  - text: /myapps - edit your
+                  - link "web apps" [ref=f2e997] [cursor=pointer]:
+                    - /url: https://core.telegram.org/bots/webapps
+                  - text: /newapp - create a new
+                  - link "web app" [ref=f2e998] [cursor=pointer]:
+                    - /url: https://core.telegram.org/bots/webapps
+                  - text: /listapps - get a list of your web apps/editapp - edit a web app/deleteapp - delete an existing web app
+                  - strong [ref=f2e999]: Games
+                  - text: /mygames - edit your
+                  - link "games" [ref=f2e1000] [cursor=pointer]:
+                    - /url: https://core.telegram.org/bots/games
+                  - text: /newgame - create a new
+                  - link "game" [ref=f2e1001] [cursor=pointer]:
+                    - /url: https://core.telegram.org/bots/games
+                  - text: /listgames - get a list of your games/editgame - edit a game/deletegame - delete an existing game
+                  - generic [ref=f2e1002] [cursor=pointer]: 17:37
+                - img "Red Heart" [ref=f2e1010] [cursor=pointer]
+              - generic [ref=f2e1013]:
+                - generic [ref=f2e1015]:
+                  - text: /newbot
+                  - generic [ref=f2e1016] [cursor=pointer]:
+                    - generic [ref=f2e1017]: 17:37
+                    - generic [ref=f2e1018]: 
+                - img "Red Heart" [ref=f2e1028] [cursor=pointer]
+              - generic [ref=f2e1031]:
+                - generic [ref=f2e1033]:
+                  - text: Alright, a new bot. How are we going to call it? Please choose a name for your bot.
+                  - generic [ref=f2e1034] [cursor=pointer]: 17:37
+                - img "Red Heart" [ref=f2e1042] [cursor=pointer]
+              - generic [ref=f2e1045]:
+                - generic [ref=f2e1047]:
+                  - text: VibeMind-agent-bot
+                  - generic [ref=f2e1048] [cursor=pointer]:
+                    - generic [ref=f2e1049]: edited 17:37
+                    - generic [ref=f2e1050]: 
+                - img "Red Heart" [ref=f2e1060] [cursor=pointer]
+              - generic [ref=f2e1063]:
+                - generic [ref=f2e1065]:
+                  - text: "Good. Now let's choose a username for your bot. It must end in `bot`. Like this, for example: TetrisBot or tetris_bot."
+                  - generic [ref=f2e1066] [cursor=pointer]: 17:37
+                - img "Red Heart" [ref=f2e1074] [cursor=pointer]
+              - generic [ref=f2e1077]:
+                - generic [ref=f2e1079]:
+                  - text: /newbot
+                  - generic [ref=f2e1080] [cursor=pointer]:
+                    - generic [ref=f2e1081]: 17:37
+                    - generic [ref=f2e1082]: 
+                - img "Red Heart" [ref=f2e1092] [cursor=pointer]
+              - generic [ref=f2e1095]:
+                - generic [ref=f2e1097]:
+                  - text: Alright, a new bot. How are we going to call it? Please choose a name for your bot.
+                  - generic [ref=f2e1098] [cursor=pointer]: 17:37
+                - img "Red Heart" [ref=f2e1106] [cursor=pointer]
+              - generic [ref=f2e1109]:
+                - generic [ref=f2e1111]:
+                  - text: VibeMind-agent_bot
+                  - generic [ref=f2e1112] [cursor=pointer]:
+                    - generic [ref=f2e1113]: edited 17:38
+                    - generic [ref=f2e1114]: 
+                - img "Red Heart" [ref=f2e1124] [cursor=pointer]
+              - generic [ref=f2e1127]:
+                - generic [ref=f2e1129]:
+                  - text: "Good. Now let's choose a username for your bot. It must end in `bot`. Like this, for example: TetrisBot or tetris_bot."
+                  - generic [ref=f2e1130] [cursor=pointer]: 17:38
+                - img "Red Heart" [ref=f2e1138] [cursor=pointer]
+              - generic [ref=f2e1141]:
+                - generic [ref=f2e1143]:
+                  - text: VibeMind_agent_bot
+                  - generic [ref=f2e1144] [cursor=pointer]:
+                    - generic [ref=f2e1145]: edited 17:38
+                    - generic [ref=f2e1146]: 
+                - img "Red Heart" [ref=f2e1156] [cursor=pointer]
+              - generic [ref=f2e1159]:
+                - generic [ref=f2e1161]:
+                  - text: Sorry, this username is invalid.
+                  - generic [ref=f2e1162] [cursor=pointer]: 17:38
+                - img "Red Heart" [ref=f2e1170] [cursor=pointer]
+              - generic [ref=f2e1173]:
+                - generic [ref=f2e1175]:
+                  - text: VibeMind_agent_bot
+                  - generic [ref=f2e1176] [cursor=pointer]:
+                    - generic [ref=f2e1177]: 17:38
+                    - generic [ref=f2e1178]: 
+                - img "Red Heart" [ref=f2e1188] [cursor=pointer]
+              - generic [ref=f2e1191]:
+                - generic [ref=f2e1193]:
+                  - text: Done! Congratulations on your new bot. You will find it at
+                  - link "t.me/VibeMind_agent_bot" [ref=f2e1194] [cursor=pointer]:
+                    - /url: https://t.me/VibeMind_agent_bot
+                  - text: ". You can now add a description, about section and profile picture for your bot, see /help for a list of commands. By the way, when you've finished creating your cool bot, ping our Bot Support if you want a better username for it. Just make sure the bot is fully operational before you do this.Use this token to access the HTTP API:"
+                  - textbox [ref=f2e1195] [cursor=pointer]
+                  - text: Keep your token
+                  - strong [ref=f2e1196]: secure
+                  - text: and
+                  - strong [ref=f2e1197]: store it safely
+                  - text: ", it can be used by anyone to control your bot.For a description of the Bot API, see this page:"
+                  - link "https://core.telegram.org/bots/api" [ref=f2e1198] [cursor=pointer]:
+                    - /url: https://core.telegram.org/bots/api
+                  - generic [ref=f2e1199] [cursor=pointer]: 17:38
+                - img "Red Heart" [ref=f2e1207] [cursor=pointer]
+              - generic [ref=f2e1210]:
+                - generic [ref=f2e1212]:
+                  - textbox [ref=f2e1213] [cursor=pointer]
+                  - generic [ref=f2e1214] [cursor=pointer]:
+                    - generic [ref=f2e1215]: 17:40
+                    - generic [ref=f2e1216]: 
+                - img "Red Heart" [ref=f2e1226] [cursor=pointer]
+              - generic [ref=f2e1229]:
+                - generic [ref=f2e1231]:
+                  - text: I can help you create and manage Telegram bots. If you're new to the Bot API, please
+                  - link "see the manual" [ref=f2e1232] [cursor=pointer]:
+                    - /url: https://core.telegram.org/bots
+                  - text: .You can control me by sending these commands:/newbot - create a new bot/mybots - edit your bots
+                  - strong [ref=f2e1233]: Edit Bots
+                  - text: /setname - change a bot's name/setdescription - change bot description/setabouttext - change bot about info/setuserpic - change bot profile photo/setcommands - change the list of commands/deletebot - delete a bot
+                  - strong [ref=f2e1234]: Bot Settings
+                  - text: /token - get authorization token/revoke - revoke bot access token/setinline - toggle
+                  - link "inline mode" [ref=f2e1235] [cursor=pointer]:
+                    - /url: https://core.telegram.org/bots/inline
+                  - text: /setinlinegeo - toggle inline
+                  - link "location requests" [ref=f2e1236] [cursor=pointer]:
+                    - /url: https://core.telegram.org/bots/inline#location-based-results
+                  - text: /setinlinefeedback - change
+                  - link "inline feedback" [ref=f2e1237] [cursor=pointer]:
+                    - /url: https://core.telegram.org/bots/inline#collecting-feedback
+                  - text: settings/setjoingroups - can your bot be added to groups?/setprivacy - toggle
+                  - link "privacy mode" [ref=f2e1238] [cursor=pointer]:
+                    - /url: https://core.telegram.org/bots/features#privacy-mode
+                  - text: in groups
+                  - strong [ref=f2e1239]: Web Apps
+                  - text: /myapps - edit your
+                  - link "web apps" [ref=f2e1240] [cursor=pointer]:
+                    - /url: https://core.telegram.org/bots/webapps
+                  - text: /newapp - create a new
+                  - link "web app" [ref=f2e1241] [cursor=pointer]:
+                    - /url: https://core.telegram.org/bots/webapps
+                  - text: /listapps - get a list of your web apps/editapp - edit a web app/deleteapp - delete an existing web app
+                  - strong [ref=f2e1242]: Games
+                  - text: /mygames - edit your
+                  - link "games" [ref=f2e1243] [cursor=pointer]:
+                    - /url: https://core.telegram.org/bots/games
+                  - text: /newgame - create a new
+                  - link "game" [ref=f2e1244] [cursor=pointer]:
+                    - /url: https://core.telegram.org/bots/games
+                  - text: /listgames - get a list of your games/editgame - edit a game/deletegame - delete an existing game
+                  - generic [ref=f2e1245] [cursor=pointer]: 17:40
+                - img "Red Heart" [ref=f2e1253] [cursor=pointer]
+              - generic [ref=f2e1256]:
+                - generic [ref=f2e1258]:
+                  - textbox [ref=f2e1259] [cursor=pointer]
+                  - generic [ref=f2e1260] [cursor=pointer]:
+                    - generic [ref=f2e1261]: 17:41
+                    - generic [ref=f2e1262]: 
+                - img "Red Heart" [ref=f2e1272] [cursor=pointer]
+              - generic [ref=f2e1275]:
+                - generic [ref=f2e1277]:
+                  - text: I can help you create and manage Telegram bots. If you're new to the Bot API, please
+                  - link "see the manual" [ref=f2e1278] [cursor=pointer]:
+                    - /url: https://core.telegram.org/bots
+                  - text: .You can control me by sending these commands:/newbot - create a new bot/mybots - edit your bots
+                  - strong [ref=f2e1279]: Edit Bots
+                  - text: /setname - change a bot's name/setdescription - change bot description/setabouttext - change bot about info/setuserpic - change bot profile photo/setcommands - change the list of commands/deletebot - delete a bot
+                  - strong [ref=f2e1280]: Bot Settings
+                  - text: /token - get authorization token/revoke - revoke bot access token/setinline - toggle
+                  - link "inline mode" [ref=f2e1281] [cursor=pointer]:
+                    - /url: https://core.telegram.org/bots/inline
+                  - text: /setinlinegeo - toggle inline
+                  - link "location requests" [ref=f2e1282] [cursor=pointer]:
+                    - /url: https://core.telegram.org/bots/inline#location-based-results
+                  - text: /setinlinefeedback - change
+                  - link "inline feedback" [ref=f2e1283] [cursor=pointer]:
+                    - /url: https://core.telegram.org/bots/inline#collecting-feedback
+                  - text: settings/setjoingroups - can your bot be added to groups?/setprivacy - toggle
+                  - link "privacy mode" [ref=f2e1284] [cursor=pointer]:
+                    - /url: https://core.telegram.org/bots/features#privacy-mode
+                  - text: in groups
+                  - strong [ref=f2e1285]: Web Apps
+                  - text: /myapps - edit your
+                  - link "web apps" [ref=f2e1286] [cursor=pointer]:
+                    - /url: https://core.telegram.org/bots/webapps
+                  - text: /newapp - create a new
+                  - link "web app" [ref=f2e1287] [cursor=pointer]:
+                    - /url: https://core.telegram.org/bots/webapps
+                  - text: /listapps - get a list of your web apps/editapp - edit a web app/deleteapp - delete an existing web app
+                  - strong [ref=f2e1288]: Games
+                  - text: /mygames - edit your
+                  - link "games" [ref=f2e1289] [cursor=pointer]:
+                    - /url: https://core.telegram.org/bots/games
+                  - text: /newgame - create a new
+                  - link "game" [ref=f2e1290] [cursor=pointer]:
+                    - /url: https://core.telegram.org/bots/games
+                  - text: /listgames - get a list of your games/editgame - edit a game/deletegame - delete an existing game
+                  - generic [ref=f2e1291] [cursor=pointer]: 17:41
+                - img "Red Heart" [ref=f2e1299] [cursor=pointer]
+            - generic [ref=f2e1329]:
+              - generic: Today
+              - generic [ref=f2e1333]:
+                - generic [ref=f2e1335]:
+                  - text: /newbot
+                  - generic [ref=f2e1336] [cursor=pointer]:
+                    - generic [ref=f2e1337]: 17:03
+                    - generic [ref=f2e1339]:
+                      - text: 
+                      - generic [ref=f2e1340]: 
+                - img "Red Heart" [ref=f2e1348] [cursor=pointer]
+              - generic [ref=f2e1351]:
+                - generic [ref=f2e1353]:
+                  - text: Alright, a new bot. How are we going to call it? Please choose a name for your bot.
+                  - generic [ref=f2e1354] [cursor=pointer]: 17:03
+                - img "Red Heart" [ref=f2e1362] [cursor=pointer]
+              - generic [ref=f2e1383]:
+                - generic [ref=f2e1385]:
+                  - text: Festival Orga
+                  - generic [ref=f2e1386] [cursor=pointer]:
+                    - generic [ref=f2e1387]: 17:04
+                    - generic [ref=f2e1389]:
+                      - text: 
+                      - generic [ref=f2e1398]: 
+                - img "Red Heart" [ref=f2e1402] [cursor=pointer]
+              - generic [ref=f2e1405]:
+                - generic [ref=f2e1407]:
+                  - text: "Good. Now let's choose a username for your bot. It must end in `bot`. Like this, for example: TetrisBot or tetris_bot."
+                  - generic [ref=f2e1408] [cursor=pointer]: 17:04
+                - img "Red Heart" [ref=f2e1416] [cursor=pointer]
+              - generic [ref=f2e1424]:
+                - generic [ref=f2e1426]:
+                  - text: FestivalOrgaBot
+                  - generic [ref=f2e1427] [cursor=pointer]:
+                    - generic [ref=f2e1428]: 17:04
+                    - generic [ref=f2e1430]:
+                      - text: 
+                      - generic [ref=f2e1431]: 
+                - img "Red Heart" [ref=f2e1439] [cursor=pointer]
+              - generic [ref=f2e1444]:
+                - generic [ref=f2e1446]:
+                  - text: Done! Congratulations on your new bot. You will find it at
+                  - link "t.me/FestivalOrgaBot" [ref=f2e1447] [cursor=pointer]:
+                    - /url: https://t.me/FestivalOrgaBot
+                  - text: ". You can now add a description, about section and profile picture for your bot, see /help for a list of commands. By the way, when you've finished creating your cool bot, ping our Bot Support if you want a better username for it. Just make sure the bot is fully operational before you do this.Use this token to access the HTTP API:"
+                  - textbox [ref=f2e1448] [cursor=pointer]
+                  - text: Keep your token
+                  - strong [ref=f2e1449]: secure
+                  - text: and
+                  - strong [ref=f2e1450]: store it safely
+                  - text: ", it can be used by anyone to control your bot.For a description of the Bot API, see this page:"
+                  - link "https://core.telegram.org/bots/api" [ref=f2e1451] [cursor=pointer]:
+                    - /url: https://core.telegram.org/bots/api
+                  - generic [ref=f2e1452] [cursor=pointer]: 17:04
+                - img "Red Heart" [ref=f2e1460] [cursor=pointer]
+              - generic [ref=f2e1463]:
+                - generic [ref=f2e1465]:
+                  - text: /setprivacy
+                  - generic [ref=f2e1466] [cursor=pointer]:
+                    - generic [ref=f2e1467]: 17:04
+                    - generic [ref=f2e1469]:
+                      - text: 
+                      - generic [ref=f2e1478]: 
+                - img "Red Heart" [ref=f2e1482] [cursor=pointer]
+              - generic [ref=f2e1485]:
+                - generic [ref=f2e1487]:
+                  - text: Choose a bot to change group messages settings.
+                  - generic [ref=f2e1488] [cursor=pointer]: 17:04
+                - img "Red Heart" [ref=f2e1496] [cursor=pointer]
+              - generic [ref=f2e1508]:
+                - generic [ref=f2e1510]:
+                  - text: "@FestivalOrgaBot"
+                  - generic [ref=f2e1511] [cursor=pointer]:
+                    - generic [ref=f2e1512]: 17:05
+                    - generic [ref=f2e1514]:
+                      - text: 
+                      - generic [ref=f2e1515]: 
+                - img "Red Heart" [ref=f2e1523] [cursor=pointer]
+              - generic [ref=f2e1526]:
+                - generic [ref=f2e1528]:
+                  - text: "'Enable' - your bot will only receive messages that either start with the '/' symbol or mention the bot by username.'Disable' - your bot will receive all messages that people send to groups.Current status is: ENABLED"
+                  - generic [ref=f2e1529] [cursor=pointer]: 17:05
+                - img "Red Heart" [ref=f2e1537] [cursor=pointer]
+              - generic [ref=f2e1542]:
+                - generic [ref=f2e1544]:
+                  - text: Disable
+                  - generic [ref=f2e1545] [cursor=pointer]:
+                    - generic [ref=f2e1546]: 17:05
+                    - generic [ref=f2e1548]:
+                      - text: 
+                      - generic [ref=f2e1557]: 
+                - img "Red Heart" [ref=f2e1561] [cursor=pointer]
+              - generic [ref=f2e1564]:
+                - generic [ref=f2e1566]:
+                  - text: "Success! The new status is: DISABLED. /help"
+                  - generic [ref=f2e1567] [cursor=pointer]: 17:05
+                - img "Red Heart" [ref=f2e1575] [cursor=pointer]
+          - generic [ref=f2e1300]:
+            - generic:
+              - generic:
+                - button "AccDescrPollVoteDown":
+                  - generic: 
+                - generic: 
+              - generic:
+                - button "Go to next unread reactions":
+                  - generic: 
+                - generic: 
+              - generic:
+                - button "Go to next mention":
+                  - generic: 
+                - generic: 
+              - generic:
+                - button "Go to bottom":
+                  - generic: 
+            - generic [ref=f2e1301]:
+              - generic [ref=f2e1303]:
+                - button "Open bot command keyboard" [ref=f2e1304] [cursor=pointer]:
+                  - generic [ref=f2e1305]: 
+                  - generic [ref=f2e1306]: Open
+                - generic [ref=f2e1307]:
+                  - button "Add an attachment" [ref=f2e1308] [cursor=pointer]:
+                    - generic [ref=f2e1309]: 
+                  - menu "Add an attachment":      
+                - generic:
+                  - button:
+                    - generic: 
+                  - button [disabled]:
+                    - generic: 
+                - button "Open full editor":
+                  - generic: 
+                - generic [ref=f2e1310]:
+                  - generic [ref=f2e1313]:
+                    - textbox "Message" [ref=f2e1314]:
+                      - paragraph [ref=f2e1315]
+                    - generic: Message
+                  - generic:
+                    - generic:
+                      - generic:
+                        - paragraph
+                  - generic:
+                    - generic:
+                      - button [disabled]:
+                        - generic: 
+                    - generic:
+                      - button [disabled]:
+                        - generic: 
+                    - button [disabled]:
+                      - generic: 
+                    - button [disabled]:
+                      - generic: 
+                    - button [disabled]:
+                      - generic: 
+                    - button [disabled]:
+                      - generic: 
+                - button "Choose emoji, sticker or GIF" [ref=f2e1316] [cursor=pointer]:
+                  - generic [ref=f2e1317]: 
+              - button "Record voice message" [ref=f2e1318] [cursor=pointer]:
+                - generic [ref=f2e1319]: 
+                - generic [ref=f2e1320]: 
+                - text: 
+                - generic [ref=f2e1321]: 
+                - generic [ref=f2e1322]: 
+              - generic:  
+              - generic:  
+            - generic:
+              - generic:
+                - generic "0 messages selected"
+      - generic [ref=f2e1363]:
+        - img "BotFather" [ref=f2e1366]
+        - generic [ref=f2e1367]:
+          - generic [ref=f2e1368]: 
+          - textbox "Search" [ref=f2e1371]
+          - button [ref=f2e1374] [cursor=pointer]:
+            - generic [ref=f2e1375]: 
+        - button "Jump to Date" [ref=f2e1377] [cursor=pointer]:
+          - generic [ref=f2e1378]: 

@@ -32,6 +32,7 @@ export function NewTaskForm({
         body: JSON.stringify({
           categoryId,
           title: formData.get("title"),
+          description: formData.get("description"),
           memberId: assignment.startsWith("m:") ? assignment.slice(2) : "",
           teamId: assignment.startsWith("t:") ? assignment.slice(2) : "",
           estimatedCost: formData.get("estimatedCost"),
@@ -65,6 +66,12 @@ export function NewTaskForm({
         name="title"
         placeholder="Titel"
         required
+        className="w-full rounded-md border border-white/20 bg-black/20 px-2 py-1 text-xs"
+      />
+      <textarea
+        name="description"
+        rows={2}
+        placeholder="Beschreibung (optional) — Maße, Fundort, Ansprechpartner"
         className="w-full rounded-md border border-white/20 bg-black/20 px-2 py-1 text-xs"
       />
       <select

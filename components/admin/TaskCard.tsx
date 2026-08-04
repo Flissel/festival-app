@@ -12,6 +12,8 @@ type TeamRef = { id: string; name: string; members: MemberRef[] };
 type Task = {
   id: string;
   title: string;
+  description: string | null;
+  imageUrl: string | null;
   status: TaskStatus;
   categoryName: string;
   member: MemberRef | null;
@@ -84,6 +86,22 @@ export function TaskCard({
       }`}
     >
       <p className="font-medium">{task.title}</p>
+      {task.description && (
+        <p className="mt-1 whitespace-pre-line text-xs text-white/60">{task.description}</p>
+      )}
+      {task.imageUrl && (
+        <a href={task.imageUrl} target="_blank" rel="noopener noreferrer" className="mt-2 block">
+          {/* Kein next/image: Die URL zeigt auf den Blob-Speicher, und für ein
+              Vorschaubild im Board lohnt die Optimierungs-Pipeline nicht. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={task.imageUrl}
+            alt={`Foto zu ${task.title}`}
+            className="max-h-32 w-full rounded-md border border-white/10 object-cover"
+            loading="lazy"
+          />
+        </a>
+      )}
       {overdue && <p className="mt-1 text-xs text-red-400">Überfällig</p>}
 
       <div className="mt-2 flex items-center gap-2">
