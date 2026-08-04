@@ -8,6 +8,7 @@ import { parseDueDate } from "@/lib/dueDate";
 import { recordAudit } from "@/lib/audit";
 import { isUniqueViolation, isRecordNotFound } from "@/lib/prismaError";
 import { importOrgaPlan } from "@/lib/orgaPlan";
+import { sendToPhone } from "@/lib/openclaw";
 
 const statusLabels: Record<string, string> = {
   open: "offen",
@@ -745,6 +746,57 @@ export function createMcpServer() {
       });
 
       return text(`${updated.name}: ${changes.join(", ")}.`);
+    }
+  );
+
+  // Die Nummer wird hier aufgelöst und direkt ans Gateway gegeben — sie taucht
+  // in keiner Antwort auf. So kann der Chat jemanden einzeln anschreiben, ohne
+  // dass Telefonnummern in der Gruppe landen.
+  server.registerTool(
+    "send_message_to_member",
+    {
+      title: "Nachricht an eine Person schicken",
+      description:
+        "Schickt einer Person aus der Orga eine Einzelnachricht über WhatsApp. Die Person wird am Namen gesucht; ihre Telefonnummer bleibt hier unsichtbar.",
+      inputSchema: {
+        actor: actorSchema,
+        name: z.string().min(1).max(100).describe("Name der Person, wie in list_members"),
+        message: z.string().trim().min(1).max(2000).describe("Text der Nachricht"),
+      },
+    },
+    async ({ actor, name, message }) => {
+      const members = await prisma.member.findMany({
+        where: { name: { equals: name.trim(), mode: "insensitive" } },
+      });
+      if (members.length === 0) return text(`„${name}" ist nicht in der Orga.`);
+      if (members.length > 1) {
+        return text(
+          `Es gibt ${members.length} Personen namens „${name}". Bitte den Namen eindeutiger angeben.`
+        );
+      }
+
+      const member = members[0];
+      if (!member.phone) {
+        return text(
+          `Für „${member.name}" ist keine Telefonnummer hinterlegt — ohne sie geht keine Einzelnachricht.`
+        );
+      }
+
+      const result = await sendToPhone(member.phone, message);
+      if (!result.ok) {
+        return text(`Konnte „${member.name}" nicht erreichen: ${result.error}`);
+      }
+
+      await recordAudit({
+        source: "chat",
+        actor,
+        action: "member.message",
+        entity: "Member",
+        entityId: member.id,
+        summary: `Nachricht an „${member.name}" geschickt`,
+      });
+
+      return text(`Nachricht an „${member.name}" ist raus.`);
     }
   );
 
