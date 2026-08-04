@@ -204,8 +204,20 @@ Push und Pull Request aus.
 ## Deployment
 
 Das Projekt ist für Vercel mit einer Postgres-Datenbank (z. B. Neon) ausgelegt.
-`npm run build` führt `prisma generate` und `prisma migrate deploy` aus, Migrationen
-werden also beim Deploy automatisch angewendet. Nach dem ersten Deploy einmalig
+`npm run build` führt `prisma generate` und die Migrationen aus, letztere über
+[`scripts/migrate-deploy.mjs`](scripts/migrate-deploy.mjs) statt direkt.
+
+Der Grund: Prisma gibt beim Anfordern seiner Advisory Lock nach 10 Sekunden auf
+(`P1002`), und dieses Fenster ist für unseren Aufbau zu knapp. Neon fährt die
+Datenbank bei Inaktivität herunter, und Preview und Production teilen sich eine
+— ein Build, der die Datenbank aufweckt oder gegen einen parallelen Build
+antritt, verliert das Rennen. Das Skript versucht es deshalb dreimal (5 s, 15 s
+Pause) und bricht bei allem, was nicht nach einem vorübergehenden Fehler
+aussieht, sofort ab. Ein zweiter Anlauf ist gefahrlos, weil `migrate deploy` nur
+anwendet, was noch nicht angewendet ist.
+
+Sauberer wäre eine eigene Datenbank für Preview — dann entfällt wenigstens der
+Wettlauf zwischen den Umgebungen. Nach dem ersten Deploy einmalig
 `npm run db:seed` gegen die Produktions-Datenbank ausführen — oder stattdessen im
 Admin unter *Aufgaben* auf „Orga-Plan einspielen" klicken.
 
