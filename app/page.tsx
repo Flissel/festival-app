@@ -2,8 +2,31 @@ import { RsvpForm } from "@/components/RsvpForm";
 import { LocationMap } from "@/components/LocationMap";
 import { SiteFooter } from "@/components/SiteFooter";
 import { KaleidoscopeField } from "@/components/KaleidoscopeField";
+import { Timetable } from "@/components/Timetable";
 import { formatEventDate, getEvent } from "@/lib/event";
 import { donationConfig } from "@/lib/donation";
+import { prisma } from "@/lib/prisma";
+import { logger } from "@/lib/logger";
+import type { Slot } from "@/lib/timetable";
+
+/**
+ * Nur die Punkte, die auf die Einladung sollen. Fällt die Abfrage aus, steht
+ * die Einladung trotzdem — ohne Zeitplan, aber mit Termin, Ort und Formular.
+ * Aus demselben Grund fängt auch getEvent seine Fehler ab.
+ */
+async function getPublicSlots(): Promise<Slot[]> {
+  try {
+    return await prisma.timetableSlot.findMany({
+      where: { isPublic: true },
+      orderBy: { startsAt: "asc" },
+    });
+  } catch (error) {
+    logger.error("timetable.load_failed", {
+      error: error instanceof Error ? error.message : String(error),
+    });
+    return [];
+  }
+}
 
 // Statisch würde der Spendenlink beim Build eingebacken. Wer ihn später in den
 // Umgebungsvariablen setzt, sähe ihn dann unter /admin/spenden schon, die Gäste
@@ -13,7 +36,7 @@ export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
   const { paypalMeHandle, iban, ibanHolder } = donationConfig();
-  const event = await getEvent();
+  const [event, slots] = await Promise.all([getEvent(), getPublicSlots()]);
 
   return (
     <main className="relative flex min-h-screen flex-1 flex-col overflow-hidden bg-gradient-to-b from-neutral-950 via-neutral-900 to-neutral-950 text-white">
@@ -36,7 +59,9 @@ export default async function HomePage() {
           <p className="mt-3 text-lg font-medium text-white/90 [text-shadow:0_1px_8px_rgba(0,0,0,0.8)]">
             {formatEventDate(event.startsAt)}
           </p>
-          {event.lineupNote && (
+          {/* Der Hinweis tritt zurück, sobald der Zeitplan steht: „Line-up
+              folgt" über einem ausgefüllten Line-up wäre schlicht falsch. */}
+          {event.lineupNote && slots.length === 0 && (
             <p className="mt-2 inline-block rounded-full border border-white/25 bg-black/30 px-3 py-1 text-xs uppercase tracking-wider text-white/70">
               {event.lineupNote}
             </p>
@@ -56,6 +81,8 @@ export default async function HomePage() {
             wissen, mit wie vielen wir planen dürfen — mehr brauchen wir nicht.
           </p>
         </header>
+
+        <Timetable slots={slots} eventStart={event.startsAt} />
 
         <LocationMap />
 

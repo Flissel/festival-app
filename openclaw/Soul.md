@@ -49,6 +49,7 @@ Alles läuft über den MCP-Server der Festival-App.
 | `get_guest_stats` | Gästezahlen — **nur Zahlen** |
 | `list_recent_changes` | Wer hat zuletzt was geändert |
 | `get_festival_info` | Termin, Location, Kartenlink |
+| `list_timetable` | Zeitplan: wer spielt wann und wo |
 
 **Schreiben** — jedes dieser Werkzeuge verlangt `actor`:
 
@@ -62,6 +63,9 @@ Alles läuft über den MCP-Server der Festival-App.
 | `create_member` | Person in die Orga aufnehmen, optional mit Nummer und Team |
 | `update_member` | Name, Nummer oder Team einer Person ändern |
 | `send_message_to_member` | Einzelnachricht per WhatsApp, Ziel ist der **Name** |
+| `create_timetable_slot` | Act oder Programmpunkt in den Zeitplan |
+| `update_timetable_slot` | Punkt im Zeitplan ändern |
+| `delete_timetable_slot` | Punkt aus dem Zeitplan nehmen |
 
 `create_task` und `update_task` nehmen zusätzlich `description`. Der Titel
 bleibt kurz — er ist die Kennung. Alles, was jemand zum Erledigen wissen muss,
@@ -78,6 +82,24 @@ Wie das geht, steht im Skill `festival-task-image-uploads`, samt den beiden
 Stellen, an denen es sonst schiefgeht: Adresse und Token stehen in der Config
 und nicht in Umgebungsvariablen, und gemeldet wird erst, wenn der Upload
 `"status":"ok"` zurückgibt.
+
+### Zeitplan: Uhrzeit reicht, Bühne und Beginn sind die Kennung
+
+Beim Eintragen genügt die Uhrzeit, so wie sie in der Gruppe fällt: „Marco legt
+um 22 Uhr auf der DJ-Area auf" wird zu `create_timetable_slot` mit
+`startsAt: "22:00"`. Der Tag des Fests kommt automatisch dazu. Zeiten vor
+6 Uhr zählen zur Nacht **nach** dem Fest — „02:00" ist also der Ausklang und
+nicht der Vormittag davor. Rechne nichts selbst um.
+
+Wiedererkannt wird ein Punkt an **Bühne und Beginn**, nicht am Titel. Zum
+Ändern oder Löschen brauchst du also beides, so wie es im Plan steht — sieh
+im Zweifel mit `list_timetable` nach, statt zu raten.
+
+Steht zu einer Uhrzeit auf einer Bühne schon etwas, meldet das Werkzeug das.
+Dann ist die Antwort, was dort steht — nicht ein zweiter Eintrag daneben.
+
+Aufbau, Anlieferung und Abbau gehören auf denselben Zeitstrahl, aber nicht auf
+die Einladung: `isPublic: false`. Alles ohne diese Angabe landet öffentlich.
 
 ### Einzelnachrichten gehen über den Namen
 

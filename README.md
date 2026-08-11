@@ -26,6 +26,9 @@ Orga verwaltet Gäste, Aufgaben, Budget und Teams im passwortgeschützten Admin-
   Bestätigung vor
 - **Event-Daten** unter `/admin/event`: Name, Beginn, Ende und Line-up ohne Deploy
   ändern; schlägt auf Einladung, Kalenderdatei, Vorschaubild und Mails durch
+- **Zeitplan** unter `/admin/timetable`: wer spielt wann und wo, nach Bühnen;
+  öffentliche Punkte stehen auf der Einladung, interne (Aufbau, Abbau) nur im
+  Admin. Auch über den Chat pflegbar
 - **Verlauf** unter `/admin/verlauf`: wer hat was geändert — aus dem Admin und aus
   der Orga-Gruppe
 - **MCP-Server** unter `/api/mcp` (Bearer-Token) als Datenzugang für OpenClaw
@@ -108,6 +111,37 @@ sich kein Kalendereintrag bauen. Eingegeben wird deutsche Ortszeit
 eine Kalenderdatei mit Termin, Ort und Koordinaten.
 
 Die Location steht weiterhin in [`lib/venue.ts`](lib/venue.ts).
+
+## Zeitplan
+
+Unter `/admin/timetable` steht, wer wann auf welcher Bühne spielt. Die Bühne ist
+Freitext mit Vorschlägen: Welche Areas es gibt, entscheidet sich beim Aufbau und
+nicht beim Deploy — die Vorschlagsliste verhindert nur, dass daraus „DJ-Area"
+neben „DJ Area" wird.
+
+Auf denselben Zeitstrahl gehören auch Aufbau, Anlieferung und Abbau. Die
+unterscheiden sich vom Line-up nur darin, dass sie niemanden außerhalb der Orga
+etwas angehen — dafür ist der Haken *Auf der Einladung zeigen* da. Sobald ein
+öffentlicher Punkt existiert, zeigt die Einladung den Zeitplan statt des
+Hinweises „Line-up folgt".
+
+Zwei Eigenheiten, die daher rühren, dass das Fest über Mitternacht geht:
+
+- Ein Punkt, der über Mitternacht läuft, bekommt den Wochentag hinten
+  angehängt — „23:00–01:00 (So)" statt einer Zeitangabe, die rückwärts läuft.
+- Ein Punkt, der an einem anderen Tag als das Fest beginnt, bekommt ihn vorne —
+  „So ab 10:00" für den Abbau. Ohne das stünde er als „ab 10:00" direkt unter
+  dem Aufbau am Vortag um „10:00–12:00", und beide sähen gleichzeitig aus.
+
+Zwei Punkte, die sich auf einer Bühne überschneiden, werden gemeldet, aber nicht
+verhindert — zwei Acts, die zehn Minuten ineinander übergehen, können Absicht
+sein. Dieselbe Uhrzeit auf derselben Bühne lehnt die Datenbank dagegen ab; das
+ist keine Planung, sondern ein Versehen.
+
+Aus dem Chat heraus genügt die Uhrzeit: `create_timetable_slot` mit
+`startsAt: "22:00"` ergänzt den Tag des Fests, und Zeiten vor 6 Uhr zählen zur
+Nacht danach. Wiedererkannt wird ein Punkt an **Bühne und Beginn**, nicht am
+Titel — so ändert und löscht ihn der Bot auch.
 
 ## OpenClaw als Orga-Assistent
 

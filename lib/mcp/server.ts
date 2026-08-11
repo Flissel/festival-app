@@ -9,6 +9,7 @@ import { recordAudit } from "@/lib/audit";
 import { isUniqueViolation, isRecordNotFound } from "@/lib/prismaError";
 import { importOrgaPlan } from "@/lib/orgaPlan";
 import { sendToPhone } from "@/lib/openclaw";
+import { formatSlotRange, formatTime, groupByStage, parseSlotTime } from "@/lib/timetable";
 
 const statusLabels: Record<string, string> = {
   open: "offen",
@@ -824,6 +825,261 @@ export function createMcpServer() {
       });
 
       return text(`Nachricht an „${member.name}" ist raus.`);
+    }
+  );
+
+  // ------------------------------------------------------------- Zeitplan ---
+
+  server.registerTool(
+    "list_timetable",
+    {
+      title: "Zeitplan lesen",
+      description:
+        "Wer spielt wann und wo. Nach Bühne gruppiert, innerhalb einer Bühne der Reihe nach.",
+      inputSchema: {
+        stage: z.string().max(60).optional().describe("Nur diese Bühne, z. B. DJ"),
+      },
+    },
+    async ({ stage }) => {
+      const [slots, event] = await Promise.all([
+        prisma.timetableSlot.findMany({
+          where: stage ? { stage: { equals: stage.trim(), mode: "insensitive" } } : undefined,
+          orderBy: { startsAt: "asc" },
+        }),
+        getEvent(),
+      ]);
+
+      if (slots.length === 0) {
+        return text(stage ? `Für „${stage}" steht noch nichts im Plan.` : "Der Zeitplan ist leer.");
+      }
+
+      const lines = groupByStage(slots).map((group) => {
+        const entries = group.slots.map((slot) => {
+          const parts = [`  ${formatSlotRange(slot, event.startsAt)} — ${slot.title}`];
+          if (slot.note) parts.push(`(${slot.note})`);
+          // Interne Punkte sind im Chat sichtbar, auf der Einladung nicht. Ohne
+          // die Kennzeichnung sagt der Bot etwas zu, was kein Gast sieht.
+          if (!slot.isPublic) parts.push("[nur intern]");
+          return parts.join(" ");
+        });
+        return `${group.stage}:\n${entries.join("\n")}`;
+      });
+
+      return text(lines.join("\n\n"));
+    }
+  );
+
+  server.registerTool(
+    "create_timetable_slot",
+    {
+      title: "Programmpunkt in den Zeitplan aufnehmen",
+      description:
+        "Trägt einen Act oder Programmpunkt ein. Die Uhrzeit darf einfach „22:00\" sein — der Tag des Fests wird ergänzt, Zeiten vor 6 Uhr zählen zur Nacht danach.",
+      inputSchema: {
+        actor: actorSchema,
+        title: z.string().trim().min(1).max(120).describe("Act oder Programmpunkt"),
+        stage: z.string().trim().min(1).max(60).describe("Bühne oder Area, z. B. DJ"),
+        startsAt: z.string().min(1).max(30).describe("Beginn, z. B. 22:00 oder 2026-08-29T22:00"),
+        endsAt: z.string().max(30).optional().describe("Ende, gleiche Schreibweise"),
+        note: z.string().trim().max(300).optional().describe("Notiz, z. B. braucht CDJs"),
+        isPublic: z
+          .boolean()
+          .optional()
+          .describe("Auf der Einladung zeigen. Standard: ja. Aufbau und Abbau auf nein setzen."),
+      },
+    },
+    async ({ actor, title, stage, startsAt, endsAt, note, isPublic }) => {
+      const event = await getEvent();
+
+      const start = parseSlotTime(startsAt, event.startsAt);
+      if (!start) {
+        return text(
+          `„${startsAt}" konnte ich nicht als Zeitpunkt lesen. Geht z. B. als „22:00" oder „2026-08-29T22:00".`
+        );
+      }
+
+      const end = endsAt ? parseSlotTime(endsAt, event.startsAt) : null;
+      if (endsAt && !end) {
+        return text(`„${endsAt}" konnte ich nicht als Zeitpunkt lesen.`);
+      }
+      if (end && end <= start) {
+        return text("Das Ende liegt vor dem Beginn — bitte nochmal ansehen.");
+      }
+
+      try {
+        const slot = await prisma.timetableSlot.create({
+          data: {
+            title,
+            stage,
+            startsAt: start,
+            endsAt: end,
+            note: note?.trim() || null,
+            isPublic: isPublic ?? true,
+          },
+        });
+
+        await recordAudit({
+          source: "chat",
+          actor,
+          action: "timetable.create",
+          entity: "TimetableSlot",
+          entityId: slot.id,
+          summary: `„${title}" um ${formatTime(start)} auf ${stage} in den Zeitplan aufgenommen`,
+        });
+
+        return text(
+          `Eingetragen: „${title}" auf ${stage}, ${formatSlotRange(slot, event.startsAt)}.` +
+            (slot.isPublic ? "" : " Steht nur intern, nicht auf der Einladung.")
+        );
+      } catch (error) {
+        if (isUniqueViolation(error)) {
+          return text(
+            `Auf ${stage} steht um ${formatTime(start)} schon etwas im Plan. Mit update_timetable_slot ändern oder eine andere Zeit nehmen.`
+          );
+        }
+        throw error;
+      }
+    }
+  );
+
+  server.registerTool(
+    "update_timetable_slot",
+    {
+      title: "Programmpunkt ändern",
+      description:
+        "Ändert einen Punkt im Zeitplan. Gesucht wird über Bühne und Beginn — also so, wie er im Plan steht. Nur was angegeben wird, ändert sich.",
+      inputSchema: {
+        actor: actorSchema,
+        stage: z.string().trim().min(1).max(60).describe("Bühne, auf der der Punkt steht"),
+        startsAt: z.string().min(1).max(30).describe("Bisheriger Beginn, z. B. 22:00"),
+        newTitle: z.string().trim().min(1).max(120).optional(),
+        newStage: z.string().trim().min(1).max(60).optional(),
+        newStartsAt: z.string().max(30).optional(),
+        // Leerer String löscht das Ende — beim letzten Act der Nacht steht es
+        // oft erst spät fest und manchmal gar nicht.
+        newEndsAt: z.string().max(30).optional().describe("Leerer Text entfernt das Ende"),
+        newNote: z.string().max(300).optional().describe("Leerer Text entfernt die Notiz"),
+        isPublic: z.boolean().optional(),
+      },
+    },
+    async ({ actor, stage, startsAt, newTitle, newStage, newStartsAt, newEndsAt, newNote, isPublic }) => {
+      const event = await getEvent();
+
+      const start = parseSlotTime(startsAt, event.startsAt);
+      if (!start) return text(`„${startsAt}" konnte ich nicht als Zeitpunkt lesen.`);
+
+      const existing = await prisma.timetableSlot.findFirst({
+        where: { stage: { equals: stage.trim(), mode: "insensitive" }, startsAt: start },
+      });
+      if (!existing) {
+        return text(
+          `Auf ${stage} steht um ${formatTime(start)} nichts im Plan. list_timetable zeigt, was da ist.`
+        );
+      }
+
+      const data: {
+        title?: string;
+        stage?: string;
+        startsAt?: Date;
+        endsAt?: Date | null;
+        note?: string | null;
+        isPublic?: boolean;
+      } = {};
+
+      if (newTitle !== undefined) data.title = newTitle;
+      if (newStage !== undefined) data.stage = newStage;
+      if (newNote !== undefined) data.note = newNote.trim() || null;
+      if (isPublic !== undefined) data.isPublic = isPublic;
+
+      if (newStartsAt !== undefined && newStartsAt.trim() !== "") {
+        const parsed = parseSlotTime(newStartsAt, event.startsAt);
+        if (!parsed) return text(`„${newStartsAt}" konnte ich nicht als Zeitpunkt lesen.`);
+        data.startsAt = parsed;
+      }
+
+      if (newEndsAt !== undefined) {
+        if (newEndsAt.trim() === "") {
+          data.endsAt = null;
+        } else {
+          const parsed = parseSlotTime(newEndsAt, event.startsAt);
+          if (!parsed) return text(`„${newEndsAt}" konnte ich nicht als Zeitpunkt lesen.`);
+          data.endsAt = parsed;
+        }
+      }
+
+      // Gegen den Stand nach der Änderung prüfen, nicht gegen die Eingabe: Wer
+      // nur den Beginn verschiebt, soll nicht hinter dem alten Ende landen.
+      const effectiveStart = data.startsAt ?? existing.startsAt;
+      const effectiveEnd = data.endsAt !== undefined ? data.endsAt : existing.endsAt;
+      if (effectiveEnd && effectiveEnd <= effectiveStart) {
+        return text("Das Ende läge damit vor dem Beginn — bitte nochmal ansehen.");
+      }
+
+      try {
+        const slot = await prisma.timetableSlot.update({ where: { id: existing.id }, data });
+
+        await recordAudit({
+          source: "chat",
+          actor,
+          action: "timetable.update",
+          entity: "TimetableSlot",
+          entityId: slot.id,
+          summary: `Zeitplan geändert: „${slot.title}" um ${formatTime(slot.startsAt)} auf ${slot.stage}`,
+        });
+
+        return text(
+          `Geändert: „${slot.title}" auf ${slot.stage}, ${formatSlotRange(slot, event.startsAt)}.`
+        );
+      } catch (error) {
+        if (isUniqueViolation(error)) {
+          return text("Auf dieser Bühne steht zu der Uhrzeit schon etwas im Plan.");
+        }
+        throw error;
+      }
+    }
+  );
+
+  server.registerTool(
+    "delete_timetable_slot",
+    {
+      title: "Programmpunkt aus dem Zeitplan nehmen",
+      description: "Entfernt einen Punkt. Gesucht wird über Bühne und Beginn.",
+      inputSchema: {
+        actor: actorSchema,
+        stage: z.string().trim().min(1).max(60).describe("Bühne, auf der der Punkt steht"),
+        startsAt: z.string().min(1).max(30).describe("Beginn, z. B. 22:00"),
+      },
+    },
+    async ({ actor, stage, startsAt }) => {
+      const event = await getEvent();
+
+      const start = parseSlotTime(startsAt, event.startsAt);
+      if (!start) return text(`„${startsAt}" konnte ich nicht als Zeitpunkt lesen.`);
+
+      const existing = await prisma.timetableSlot.findFirst({
+        where: { stage: { equals: stage.trim(), mode: "insensitive" }, startsAt: start },
+      });
+      if (!existing) {
+        return text(`Auf ${stage} steht um ${formatTime(start)} nichts im Plan.`);
+      }
+
+      try {
+        await prisma.timetableSlot.delete({ where: { id: existing.id } });
+      } catch (error) {
+        if (isRecordNotFound(error)) return text("Der Punkt war schon weg.");
+        throw error;
+      }
+
+      await recordAudit({
+        source: "chat",
+        actor,
+        action: "timetable.delete",
+        entity: "TimetableSlot",
+        entityId: existing.id,
+        summary: `„${existing.title}" um ${formatTime(existing.startsAt)} aus dem Zeitplan entfernt`,
+      });
+
+      return text(`„${existing.title}" ist aus dem Zeitplan raus.`);
     }
   );
 
