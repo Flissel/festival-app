@@ -231,6 +231,38 @@ model Request {
 //
 // Beginn und Ende liegen bewusst als echte Zeitpunkte vor und nicht als Text:
 // Aus einem Satz wie "ab 13 Uhr" lässt sich kein Kalendereintrag bauen.
+// Ein Programmpunkt: wer spielt wann und wo.
+//
+// Bewusst nicht nur „Line-up": Auf denselben Zeitstrahl gehören auch Aufbau,
+// Anlieferung und Abbau. Die unterscheiden sich vom Line-up nur darin, dass
+// sie niemanden außerhalb der Orga etwas angehen — dafür ist `isPublic` da,
+// nicht ein zweites Modell.
+model TimetableSlot {
+  id    String @id @default(cuid())
+  title String
+  // Freitext statt Aufzählung: Welche Areas es gibt, entscheidet sich beim
+  // Aufbau und nicht beim Deploy. Das Formular schlägt die schon benutzten
+  // Namen vor, damit daraus nicht „DJ-Area" neben „DJ Area" wird.
+  stage String
+
+  startsAt DateTime
+  // Optional: Beim letzten Act der Nacht weiß niemand, wann Schluss ist.
+  endsAt   DateTime?
+  note     String?
+
+  isPublic Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Zwei Acts zur selben Zeit auf derselben Bühne sind keine Planung, sondern
+  // ein Versehen. Gleicher Grund wie bei Kategorie und Aufgabe: Der Bot
+  // erkennt einen Programmpunkt an Bühne und Beginn wieder, und ohne
+  // Constraint legen zwei gleichzeitige Zugriffe ihn doppelt an.
+  @@unique([stage, startsAt])
+  @@index([startsAt])
+}
+
 model EventInfo {
   id         String    @id
   name       String
