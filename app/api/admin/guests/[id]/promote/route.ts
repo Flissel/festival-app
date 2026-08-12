@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, after } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { logger } from "@/lib/logger";
 import { sendWaitlistPromotion } from "@/lib/email";
@@ -16,11 +16,14 @@ export async function POST(_request: NextRequest, { params }: { params: Promise<
 
   await prisma.guest.update({ where: { id }, data: { waitlisted: false } });
 
-  sendWaitlistPromotion({
-    to: guest.email,
-    name: guest.name,
-    guestId: guest.id,
-  }).catch(() => {});
+  // Siehe /api/rsvp: ohne after() stirbt der Versand mit der Antwort.
+  after(() =>
+    sendWaitlistPromotion({
+      to: guest.email,
+      name: guest.name,
+      guestId: guest.id,
+    }).catch(() => {})
+  );
 
   logger.info("admin.guest_promoted", { guestId: id });
   return NextResponse.json({ status: "ok" });

@@ -1,10 +1,17 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, after } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { logger } from "@/lib/logger";
 import { rsvpSchema } from "@/lib/validation/rsvp";
 import { sendRsvpConfirmation, sendWaitlistConfirmation } from "@/lib/email";
 import { checkRateLimit, clientIp, isHoneypotFilled } from "@/lib/rateLimit";
 import { isUniqueViolation } from "@/lib/prismaError";
+
+// Der Mailversand läuft in after() und damit innerhalb der Laufzeitgrenze
+// dieser Route. Die Vorgabe von 10 Sekunden ist für einen kalten TLS-Aufbau
+// zu Gmail knapp — und wird sie überschritten, sieht es aus wie vorher: Die
+// Anmeldung klappt, die Mail kommt nie an.
+export const maxDuration = 30;
+
 
 const DUPLICATE_MESSAGE =
   "Mit dieser E-Mail-Adresse gibt es bereits eine Anmeldung. Für Änderungen schreib uns über das Kontaktformular.";
@@ -79,11 +86,15 @@ export async function POST(request: NextRequest) {
   logger.info("rsvp.created", { guestId: guest.id, waitlisted });
 
   if (waitlisted) {
-    sendWaitlistConfirmation({ to: email, name }).catch(() => {});
+    after(() => sendWaitlistConfirmation({ to: email, name }).catch(() => {}));
     return NextResponse.json({ guestId: guest.id, waitlisted: true });
   }
 
-  sendRsvpConfirmation({ to: email, name, guestId: guest.id }).catch(() => {});
+// after() statt Absenden-und-Weiterlaufen: Ohne das endet die serverlose
+// Funktion mit der Antwort, und die noch offene SMTP-Verbindung stirbt mit ihr —
+// die Mail ging nie raus, ohne dass ein Fehler im Protokoll landete. after()
+// schiebt die Arbeit hinter die Antwort und hält die Funktion so lange am Leben.
+  after(() => sendRsvpConfirmation({ to: email, name, guestId: guest.id }).catch(() => {}));
 
   return NextResponse.json({ guestId: guest.id });
 }

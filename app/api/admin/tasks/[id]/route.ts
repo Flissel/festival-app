@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, after } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { notifyTaskAssignment } from "@/lib/taskNotifications";
@@ -112,12 +112,15 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   }
 
   if (isReassignment && (memberId || teamId)) {
-    notifyTaskAssignment({
-      memberId: memberId || null,
-      teamId: teamId || null,
-      taskTitle: task.title,
-      categoryName: task.category.name,
-    }).catch(() => {});
+    // Siehe /api/rsvp: ohne after() stirbt der Versand mit der Antwort.
+    after(() =>
+      notifyTaskAssignment({
+        memberId: memberId || null,
+        teamId: teamId || null,
+        taskTitle: task.title,
+        categoryName: task.category.name,
+      }).catch(() => {})
+    );
   }
 
   return NextResponse.json({ task: updated });
