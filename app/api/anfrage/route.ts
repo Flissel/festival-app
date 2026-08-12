@@ -1,9 +1,16 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, after } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { logger } from "@/lib/logger";
 import { requestSchema } from "@/lib/validation/request";
 import { sendRequestNotification } from "@/lib/email";
 import { checkRateLimit, clientIp, isHoneypotFilled } from "@/lib/rateLimit";
+
+// Der Mailversand läuft in after() und damit innerhalb der Laufzeitgrenze
+// dieser Route. Die Vorgabe von 10 Sekunden ist für einen kalten TLS-Aufbau
+// zu Gmail knapp — und wird sie überschritten, sieht es aus wie vorher: Die
+// Anmeldung klappt, die Mail kommt nie an.
+export const maxDuration = 30;
+
 
 export async function POST(request: NextRequest) {
   const ip = clientIp(request);
@@ -34,7 +41,11 @@ export async function POST(request: NextRequest) {
   const created = await prisma.request.create({ data: parsed.data });
   logger.info("request.created", { requestId: created.id });
 
-  sendRequestNotification(parsed.data).catch(() => {});
+// after() statt Absenden-und-Weiterlaufen: Ohne das endet die serverlose
+// Funktion mit der Antwort, und die noch offene SMTP-Verbindung stirbt mit ihr —
+// die Mail ging nie raus, ohne dass ein Fehler im Protokoll landete. after()
+// schiebt die Arbeit hinter die Antwort und hält die Funktion so lange am Leben.
+  after(() => sendRequestNotification(parsed.data).catch(() => {}));
 
   return NextResponse.json({ status: "ok" });
 }
