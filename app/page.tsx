@@ -1,10 +1,12 @@
 import { RsvpForm } from "@/components/RsvpForm";
+import { DonationBox } from "@/components/DonationBox";
 import { LocationMap } from "@/components/LocationMap";
 import { SiteFooter } from "@/components/SiteFooter";
 import { KaleidoscopeField } from "@/components/KaleidoscopeField";
 import { Timetable } from "@/components/Timetable";
 import { formatEventDate, getEvent } from "@/lib/event";
 import { donationConfig } from "@/lib/donation";
+import { mailtoLink } from "@/lib/contact";
 import { prisma } from "@/lib/prisma";
 import { logger } from "@/lib/logger";
 import type { Slot } from "@/lib/timetable";
@@ -84,11 +86,36 @@ export default async function HomePage() {
 
         <Timetable slots={slots} eventStart={event.startsAt} />
 
+        {/* Steht bewusst beim Line-up und nicht beim Kontaktformular: Wer hier
+            liest, wer spielt, ist genau die Person, die sich fragt, ob sie
+            selbst könnte. Die Adresse ist dieselbe wie im Impressum, also
+            ohnehin öffentlich. */}
+        <p className="mb-10 text-center text-sm text-white/70 [text-shadow:0_1px_8px_rgba(0,0,0,0.9)]">
+          Du legst auf und hättest Lust?{" "}
+          <a
+            href={mailtoLink(`Auflegen beim ${event.name}`)}
+            className="underline underline-offset-2 hover:text-white"
+          >
+            Schreib uns
+          </a>
+          .
+        </p>
+
         <LocationMap />
 
         {/* Leicht abgedunkelte Karte: hält das Formular über der Grafik lesbar. */}
         <div className="rounded-2xl border border-white/10 bg-neutral-950/70 p-6 backdrop-blur-sm">
-          <RsvpForm donation={{ paypalMeHandle, iban, ibanHolder }} />
+          <RsvpForm />
+
+          {/* Steht hier und nicht mehr im Formular: Vorher tauchte der
+              Spendenaufruf erst nach abgeschickter Anmeldung auf und war für
+              alle, die nur vorbeischauen, unsichtbar. Unter dem Formular, weil
+              die Anmeldung der eigentliche Zweck der Seite bleibt. */}
+          <DonationBox
+            paypalMeHandle={paypalMeHandle}
+            iban={iban}
+            ibanHolder={ibanHolder}
+          />
         </div>
 
         <p className="mt-10 text-center text-xs text-white/50 [text-shadow:0_1px_6px_rgba(0,0,0,0.9)]">

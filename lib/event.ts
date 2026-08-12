@@ -19,12 +19,12 @@ export type EventInfo = {
  * auch beim allerersten Aufruf, ohne dass jemand vorher etwas eintragen muss.
  */
 export const EVENT_DEFAULTS: EventInfo = {
-  name: "Das Festival",
+  name: "Stereo 2.0 am See",
   // 29.08.2026, 13:00 Ortszeit — im August gilt MESZ, also UTC+2.
   startsAt: new Date("2026-08-29T11:00:00.000Z"),
   // Bis 02:00 in der Nacht auf Sonntag, so weit reicht der Musikplan.
   endsAt: new Date("2026-08-30T00:00:00.000Z"),
-  lineupNote: "Line-up folgt",
+  lineupNote: "Line-up coming soon",
 };
 
 export async function getEvent(): Promise<EventInfo> {

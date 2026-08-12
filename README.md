@@ -9,9 +9,12 @@ Orga verwaltet Gäste, Aufgaben, Budget und Teams im passwortgeschützten Admin-
 - **Einladungsseite** mit Termin, „Zum Kalender hinzufügen"-Button (`.ics`),
   Anfahrtskarte, datensparsamem Anmeldeformular (Name, E-Mail, Begleitpersonen)
   und Datenschutzhinweis
-- **Freiwilliger Beitrag**: PayPal.me-Link mit vorbelegtem Betrag oder Bankverbindung,
-  Bestätigungsmail per Gmail; wer erst später etwas geben will, kommt über den Link
-  in der Mail (`/zahlung/<id>`) zurück
+- **Freiwilliger Beitrag**: PayPal.me-Link mit vorbelegtem Betrag oder Bankverbindung.
+  Der Kasten steht offen auf der Einladungsseite unter dem Anmeldeformular — wer nur
+  vorbeischaut, sieht ihn auch. Wer erst später etwas geben will, kommt über den Link
+  in der Bestätigungsmail (`/zahlung/<id>`) zurück
+- **Kontakt für Auflegende**: mailto-Link mit vorbelegtem Betreff direkt unter dem
+  Line-up, Adresse in [`lib/contact.ts`](lib/contact.ts)
 - **Warteliste**: Bei erreichter Kapazität (`RSVP_CAPACITY`) landen neue Anmeldungen
   automatisch auf der Warteliste; Nachrücken per Klick im Admin inkl. Info-Mail
 - **Kontaktformular** mit Anfragen-Inbox im Admin, E-Mail-Benachrichtigung an die Orga
@@ -104,6 +107,10 @@ Optional:
 Name, Beginn, Ende und Line-up stehen in der Datenbank und werden im Admin unter
 *Event* gepflegt. Solange dort nichts gespeichert wurde, gelten die Vorgaben aus
 [`lib/event.ts`](lib/event.ts) — die Einladung steht also vom ersten Aufruf an.
+
+Wichtig beim Ändern der Vorgaben im Code: Sobald im Admin **einmal** gespeichert
+wurde, existiert die Zeile in der Datenbank und gewinnt. Eine Änderung an
+`EVENT_DEFAULTS` wirkt dann nicht mehr — sie muss im Admin nachgezogen werden.
 
 Beginn und Ende sind echte Zeitpunkte, keine Textzeile: Aus „ab 13 Uhr" lässt
 sich kein Kalendereintrag bauen. Eingegeben wird deutsche Ortszeit
