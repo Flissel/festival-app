@@ -1,19 +1,16 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { DonationBox } from "@/components/DonationBox";
-import type { DonationDisplay } from "@/lib/donation";
 
 type RsvpResult = {
   guestId: string;
   waitlisted?: boolean;
 };
 
-type Props = {
-  donation: DonationDisplay;
-};
-
-export function RsvpForm({ donation }: Props) {
+// Der Spendenkasten stand früher hier drin und war damit erst nach der
+// Anmeldung zu sehen. Er steht jetzt auf der Seite selbst — wer nur
+// vorbeischaut, soll ihn auch sehen.
+export function RsvpForm() {
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [result, setResult] = useState<RsvpResult | null>(null);
@@ -79,8 +76,6 @@ export function RsvpForm({ donation }: Props) {
             du nicht tun — wir sehen uns vor Ort.
           </p>
         </div>
-
-        <DonationBox {...donation} />
       </div>
     );
   }
